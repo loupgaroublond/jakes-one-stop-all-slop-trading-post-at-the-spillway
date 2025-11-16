@@ -1,0 +1,17 @@
+{
+  "name": "git-wizardry",
+  "displayName": "Git Wizardry",
+  "version": "1.0.0",
+  "description": "Advanced git commands and workflows for power users",
+  "author": {
+    "name": "All-Slop Marketplace",
+    "email": "marketplace@allslop.dev"
+  },
+  "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway/tree/main/plugins/git-wizardry",
+  "repository": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
+  "license": "MIT",
+  "keywords": ["git", "version-control", "workflow", "automation"],
+  "engines": {
+    "claudeCode": ">=1.0.0"
+  }
+}

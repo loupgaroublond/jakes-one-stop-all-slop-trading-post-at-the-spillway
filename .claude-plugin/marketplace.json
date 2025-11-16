@@ -1,0 +1,166 @@
+{
+  "name": "all-slop-marketplace",
+  "displayName": "Jake's One-Stop All-Slop Trading Post at the Spillway",
+  "description": "Where the plugins are slightly used but the deals are BRAND NEW! Barely-tested, moderately-functional, absolutely FREE Claude Code extensions from down by the spillway!",
+  "owner": {
+    "name": "All-Slop Trading Post",
+    "email": "marketplace@allslop.dev"
+  },
+  "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
+  "plugins": [
+    {
+      "name": "productivity-pack",
+      "displayName": "Productivity Pack",
+      "description": "You'll be SO productive, you'll forget to eat! Pomodoro timers, note-taking, daily standups - it's like a Swiss Army knife for your workflow!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/productivity-pack",
+      "keywords": ["productivity", "tasks", "notes", "time-tracking"],
+      "license": "MIT",
+      "components": {
+        "commands": ["pomodoro", "note", "daily-standup", "time-log"]
+      }
+    },
+    {
+      "name": "git-wizardry",
+      "displayName": "Git Wizardry",
+      "description": "It's like magic, but with more merge conflicts! Smart commits, branch cleanup, and a git-expert agent that knows git better than YOU do! (No offense!)",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/git-wizardry",
+      "keywords": ["git", "version-control", "workflow"],
+      "license": "MIT",
+      "components": {
+        "commands": ["smart-commit", "interactive-rebase-guide", "branch-cleanup", "conflict-resolver"],
+        "agents": ["git-expert"]
+      }
+    },
+    {
+      "name": "claude-self-improvement",
+      "displayName": "Claude Self-Improvement Toolkit",
+      "description": "Teaching an AI to teach itself! Meta-cognitive toolkit for session reflection, config optimization, and continuous improvement. It's like therapy for Claude! (Probably!)",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/claude-self-improvement",
+      "keywords": ["meta", "self-improvement", "reflection", "configuration", "optimization", "analysis"],
+      "license": "MIT",
+      "components": {
+        "commands": ["reflect", "session-stats", "optimize-config"],
+        "agents": ["config-analyzer"],
+        "skills": ["config-optimizer"]
+      }
+    },
+    {
+      "name": "code-review-assistant",
+      "displayName": "Code Review Assistant",
+      "description": "Like having a really picky friend who actually READS your code! Automated reviews, best practices, security scans - now your code can feel judged 24/7!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/code-review-assistant",
+      "keywords": ["code-review", "quality", "best-practices"],
+      "license": "MIT",
+      "components": {
+        "commands": ["review-checklist", "security-scan"],
+        "agents": ["code-reviewer"],
+        "hooks": ["pre-commit-review"]
+      }
+    },
+    {
+      "name": "docs-generator",
+      "displayName": "Documentation Generator",
+      "description": "Finally, an END to blank README.md files! Auto-generates docs so good you'll actually read them! (Probably not though. Let's be honest.)",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/docs-generator",
+      "keywords": ["documentation", "api-docs", "readme"],
+      "license": "MIT",
+      "components": {
+        "commands": ["gen-readme", "api-docs", "changelog"],
+        "skills": ["technical-writer"]
+      }
+    },
+    {
+      "name": "test-automation",
+      "displayName": "Test Automation Suite",
+      "description": "Because YOLO is NOT a deployment strategy! Generate tests, check coverage, watch mode - everything you need to prove your code actually works!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/test-automation",
+      "keywords": ["testing", "test-generation", "coverage", "quality"],
+      "license": "MIT",
+      "components": {
+        "commands": ["gen-tests", "coverage-report", "test-watch"],
+        "agents": ["test-engineer"]
+      }
+    },
+    {
+      "name": "refactor-tools",
+      "displayName": "Refactoring Tools",
+      "description": "Make old code new again! Detects code smells (the bad kind, not the good BBQ kind), safe renames, function extraction - it's like a spa day for your codebase!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/refactor-tools",
+      "keywords": ["refactoring", "code-quality", "modernization"],
+      "license": "MIT",
+      "components": {
+        "commands": ["detect-smells", "safe-rename", "extract-function"],
+        "agents": ["refactoring-assistant"]
+      }
+    },
+    {
+      "name": "debugging-toolkit",
+      "displayName": "Debugging Toolkit",
+      "description": "For when everything's on fire and you don't know why! Advanced debugging, log analysis, error diagnosis - it's like a detective, but for your code!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/debugging-toolkit",
+      "keywords": ["debugging", "errors", "logs", "troubleshooting"],
+      "license": "MIT",
+      "components": {
+        "commands": ["analyze-logs", "trace-error", "debug-session"],
+        "agents": ["debug-detective"]
+      }
+    },
+    {
+      "name": "api-client-generator",
+      "displayName": "API Client Generator",
+      "description": "Point it at an API spec and BOOM - instant client! Works with OpenAPI, Swagger, GraphQL, and probably some other things we haven't tested yet!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/api-client-generator",
+      "keywords": ["api", "openapi", "swagger", "graphql", "codegen"],
+      "license": "MIT",
+      "components": {
+        "commands": ["gen-client", "fetch-spec", "validate-api"]
+      }
+    },
+    {
+      "name": "performance-profiler",
+      "displayName": "Performance Profiler",
+      "description": "Gotta go FAST! Profile your code, get optimization tips, run benchmarks - because slow code is like slow dial-up, and we don't do that anymore!",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/performance-profiler",
+      "keywords": ["performance", "optimization", "profiling", "benchmarks"],
+      "license": "MIT",
+      "components": {
+        "commands": ["profile", "optimize-bundle", "benchmark"],
+        "agents": ["performance-expert"]
+      }
+    },
+    {
+      "name": "database-tools",
+      "displayName": "Database Tools",
+      "description": "Wrangle your data like a digital cowboy! Migration helpers, schema management, query optimization - everything except the actual database (you gotta bring that yourself!)",
+      "version": "1.0.0",
+      "author": "All-Slop Marketplace",
+      "source": "./plugins/database-tools",
+      "keywords": ["database", "migrations", "sql", "orm"],
+      "license": "MIT",
+      "components": {
+        "commands": ["gen-migration", "optimize-query", "seed-data"],
+        "agents": ["database-architect"]
+      }
+    }
+  ]
+}

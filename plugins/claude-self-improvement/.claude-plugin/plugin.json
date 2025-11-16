@@ -1,0 +1,17 @@
+{
+  "name": "claude-self-improvement",
+  "displayName": "Claude Self-Improvement Toolkit",
+  "version": "1.0.0",
+  "description": "Meta-cognitive toolkit for Claude to analyze its own sessions, optimize configurations, and continuously improve through self-reflection",
+  "author": {
+    "name": "All-Slop Marketplace",
+    "email": "marketplace@allslop.dev"
+  },
+  "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway/tree/main/plugins/claude-self-improvement",
+  "repository": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
+  "license": "MIT",
+  "keywords": ["meta", "self-improvement", "reflection", "configuration", "optimization"],
+  "engines": {
+    "claudeCode": ">=1.0.0"
+  }
+}
