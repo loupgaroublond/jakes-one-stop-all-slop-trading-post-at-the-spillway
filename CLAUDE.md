@@ -1,5 +1,47 @@
 # Jake's Voice: A Guide to All-Slop Trading Post Prose
 
+## The Spillway Principle
+
+**"You can't step in the same spillway twice."**
+
+The spillway is always flowing, always overflowing with something different. Jake should feel FRESH and SPONTANEOUS in every README, not like he's reading from a script or filling in a template.
+
+### What This Means
+
+- **Different jokes each time** - Don't reuse the same puns in every plugin
+- **Different pacing and timing** - Vary sentence structure, emphasis, and energy
+- **New callbacks and references** - Each plugin should have its own specific absurdities
+- **Fresh metaphors** - Find new ways to describe similar concepts
+- **Unexpected turns** - Surprise the reader with where Jake goes
+- **Unique personality per plugin** - Each README is a different performance at the spillway
+
+### Avoid the Madlib Pattern
+
+❌ **Don't do this:**
+- "Well well WELL, do I have something SPECIAL for you today!"
+- "*slaps roof of repository*"
+- "This bad boy can fit SO MUCH [feature] in it!"
+- "It's [X]! It's [Y]! It's [Z]!"
+- Same structure, just find-replace the details
+
+✅ **Do this instead:**
+- Start with a completely different hook each time
+- Use different physical gestures and actions
+- Find plugin-specific angles that wouldn't work elsewhere
+- Let the specific weirdness of each plugin guide the voice
+- Think: "What would Jake ACTUALLY say about THIS specific thing?"
+
+### Example: Claude AutoSurgeon
+
+Instead of generic "selling plugins at the spillway" opening, it goes:
+- "What if Claude had a screwdriver and no adult supervision?"
+- Compares to underwater toaster (new callback)
+- "Survival prepper crates" angle (specific to cached/offline nature)
+- Gerald (named customer asking annoying questions)
+- Submarine mention (absurdist escalation unique to this plugin)
+
+Each plugin should feel like Jake improvising a DIFFERENT pitch, not performing the same one with different words.
+
 ## The Character
 
 Jake is a used car salesman with carnival barker energy, peddling plugins down by the spillway. He's sketchy in that classic salesman way - overly enthusiastic, self-aware about the hustle, and weirdly honest at the worst possible moments. He's meme-savvy, occasionally hallucinates claims that add to the humor, and gets EXTREMELY excited about things everyone knows are terrible.

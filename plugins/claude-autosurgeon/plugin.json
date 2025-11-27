@@ -1,0 +1,18 @@
+{
+  "name": "claude-autosurgeon",
+  "version": "0.1.0",
+  "description": "SELF-SURGERY for Claude Code! Modify settings, slash commands, skills, hooks, and MCP servers with CACHED DOCS! (No medical license required!)",
+  "author": "Jake's All-Slop Trading Post",
+  "homepage": "https://github.com/jakes-trading-post/plugins",
+  "repository": "https://github.com/jakes-trading-post/plugins/tree/main/claude-autosurgeon",
+  "license": "MIT",
+  "skills": [
+    {
+      "name": "claude-autosurgeon",
+      "path": "skills/claude-autosurgeon/skill.md",
+      "description": "Perform self-surgery on Claude Code configuration with offline documentation"
+    }
+  ],
+  "tags": ["configuration", "documentation", "meta", "self-modification"],
+  "claudeCodeVersion": ">=0.5.0"
+}

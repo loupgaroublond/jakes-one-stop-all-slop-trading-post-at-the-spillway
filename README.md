@@ -94,6 +94,21 @@ It's got reflection commands, session analysis, configuration optimization, AND 
 👉 [Enter The Meta-Verse](./plugins/claude-self-improvement) 👈
 
 
+### 🏥 Claude AutoSurgeon - *"Finally! A Plugin That Answers: What If Claude Had A Screwdriver?"*
+
+Listen, I KNOW what you're thinking. "Jake, why are you selling MEDICAL EQUIPMENT at a SPILLWAY?" And honestly? Fair question! But this right here is the most USEFUL questionable thing I've got!
+
+You know how Claude Code has that fancy internet-connected documentation system? Beautiful! Elegant! Totally useless if you're in a BUNKER! Or a corporate sandbox! Or an airplane! (Why are you coding on a plane? Never mind, not my business!)
+
+The AutoSurgeon gives Claude the ENTIRE documentation library - all 45 files! - cached RIGHT HERE in the plugin! It's like those survival prepper crates, except instead of canned beans, it's CANNED DOCS! Claude can modify its OWN configuration WITHOUT calling home! Settings! Slash commands! Skills! Hooks! MCP servers! The WHOLE NINE YARDS!
+
+And get this - when the docs are outdated, it's SMART enough to know! It'll offer to check the internet version! It's like having a backup surgeon on standby, except the surgeon is ALSO Claude! It's Claudes all the way down!
+
+**What you're getting:** Complete offline docs (from Nov 2025), the `claude-autosurgeon` skill, an update script with COLORED OUTPUT (I'm really proud of that), and the ability to make Claude operate on itself! It's SELF-SURGERY! At a SPILLWAY!
+
+👉 [Screwdriver Not Included](./plugins/claude-autosurgeon) 👈
+
+
 ### 🔍 Code Review Assistant - *"COMING SOON!"*
 
 **Commands:** `/review-checklist`, `/security-scan`
@@ -120,7 +135,7 @@ It's got reflection commands, session analysis, configuration optimization, AND 
 
 ### 📋 The Full Catalog
 
-Can't get enough? Want MORE? You glutton for punishment, you! Check out the [complete inventory](./.claude-plugin/marketplace.json) - we got TEN, count 'em, TEN plugins planned! (Three exist! That's like... 30%! TRENDING UPWARD!)
+Can't get enough? Want MORE? You glutton for punishment, you! Check out the [complete inventory](./.claude-plugin/marketplace.json) - we got TEN, count 'em, TEN plugins planned! (Four exist! That's like... 40%! We're ALMOST HALFWAY!)
 
 
 ## 🎨 WHAT KIND OF SLOP WE SLINGIN'?
