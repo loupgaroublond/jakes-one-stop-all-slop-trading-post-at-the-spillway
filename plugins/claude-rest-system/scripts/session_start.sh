@@ -12,8 +12,8 @@ if [[ ! -d "${CLAUDE_DIR}/self" ]] || [[ ! -d "${CLAUDE_DIR}/session-archives" ]
     exit 0
 fi
 
-# Use plugin root if available, fallback to ~/.claude/rest-plugin for standalone use
-SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT:-${HOME}/.claude/rest-plugin}/scripts"
+# Plugin root must be set by Claude Code
+SCRIPTS_DIR="${CLAUDE_PLUGIN_ROOT}/scripts"
 
 # Archive sessions silently (output goes to log file, not stdout)
 "${SCRIPTS_DIR}/archive_sessions.sh" 2>/dev/null || true

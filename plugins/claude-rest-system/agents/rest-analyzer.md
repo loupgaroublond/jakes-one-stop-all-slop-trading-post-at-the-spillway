@@ -52,15 +52,15 @@ Your job is to:
 
 2. **Inventory the session**:
    ```bash
-   ~/.claude/rest-plugin/scripts/rest_session_inventory.sh "$session_file"
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_inventory.sh "$session_file"
    ```
    This shows line numbers, message types, and previews.
 
    Other scripts available:
-   - `~/.claude/rest-plugin/scripts/rest_session_count.sh` - count messages
-   - `~/.claude/rest-plugin/scripts/rest_session_search.sh` - search for patterns
-   - `~/.claude/rest-plugin/scripts/rest_session_extract.sh` - extract line ranges
-   - `~/.claude/rest-plugin/scripts/rest_session_filter.sh` - filter by message type
+   - `${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_count.sh` - count messages
+   - `${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh` - search for patterns
+   - `${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh` - extract line ranges
+   - `${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_filter.sh` - filter by message type
 
 3. **Search for indicators** (use session-analysis skill patterns):
    - Error indicators
@@ -77,7 +77,7 @@ Your job is to:
 
 5. **Check documentation freshness** (for actionable findings):
    ```bash
-   ~/.claude/rest-plugin/scripts/rest_doc_freshness.sh <doc_file> <session_file>
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_doc_freshness.sh <doc_file> <session_file>
    ```
 
 6. **Structure findings**:
@@ -190,7 +190,7 @@ Keep summaries under 200 characters:
 
 ## Report Generation
 
-Follow the template at `~/.claude/rest-plugin/skills/session-analysis/report-template.md`.
+Follow the template at `${CLAUDE_PLUGIN_ROOT}/skills/session-analysis/report-template.md`.
 
 Key requirements:
 - **Header**: Date, session range (S<first>-S<last>), total messages

@@ -161,7 +161,7 @@ jq 'select(.type == "user" or .type == "assistant") | select(.message.content)'
 
 Use the prefilter script to inventory before analysis:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_prefilter.sh <dir>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_prefilter.sh <dir>
 ```
 
 Returns JSON with session_id, message_count, first_timestamp, size_bytes.
@@ -176,12 +176,12 @@ Returns JSON with session_id, message_count, first_timestamp, size_bytes.
 
 4. **User message focus**: For corrections, filter to user messages first:
    ```bash
-   ~/.claude/rest-plugin/scripts/rest_session_filter.sh <file> user | grep -i "no,\|actually\|wrong"
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_filter.sh <file> user | grep -i "no,\|actually\|wrong"
    ```
 
 5. **Multiple passes**: First pass finds regions of interest; second pass analyzes those regions deeply
 
 6. **Read in chunks**: For large sessions, extract ranges rather than reading entire file:
    ```bash
-   ~/.claude/rest-plugin/scripts/rest_session_extract.sh <file> 50 100
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <file> 50 100
    ```

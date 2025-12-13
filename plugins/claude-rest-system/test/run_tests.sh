@@ -112,8 +112,8 @@ echo ""
 echo "## Plugin Structure Tests"
 
 # Check plugin.json exists and is valid
-if [ -f .claude-plugin/plugin.json ]; then
-  if jq -e '.name == "rest-plugin"' .claude-plugin/plugin.json > /dev/null 2>&1; then
+if [ -f plugin.json ]; then
+  if jq -e '.name == "claude-rest-system"' plugin.json > /dev/null 2>&1; then
     echo "✓ plugin.json exists and has correct name"
     ((PASS++))
   else

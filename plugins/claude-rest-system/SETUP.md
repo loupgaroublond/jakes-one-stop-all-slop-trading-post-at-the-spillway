@@ -1,17 +1,21 @@
 # Rest Plugin Setup
 
-Installation and configuration guide for the Rest System plugin.
+Installation and configuration guide for the Claude Rest System plugin.
 
 
 ## Quick Install (Marketplace)
 
 ```bash
-/plugin install rest-plugin
+# Add the marketplace (if not already added)
+/plugin marketplace add loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway
+
+# Install the plugin
+/plugin install claude-rest-system@all-slop-marketplace
 ```
 
-That's it. The plugin automatically registers:
-- SessionStart hook (fatigue report on each session)
-- Slash commands: `/rest`, `/drilldown`, `/peers`
+The plugin automatically registers:
+- SessionStart hook (silently archives sessions)
+- Slash commands: `/yawn`, `/rest`, `/drilldown`, `/peers`
 - Subagents: `rest-analyzer`, `recommendations-assembler`, `test-analyzer`
 - Skills: `session-analysis`
 
@@ -20,12 +24,19 @@ That's it. The plugin automatically registers:
 
 ### Required: Create Data Directories
 
+On first install, the plugin will prompt you to set up directories. Ask Claude:
+
+> "Set up the Claude Rest System for me"
+
+Or manually create:
+
 ```bash
 mkdir -p ~/.claude/analysis/reports
 mkdir -p ~/.claude/analysis/sessions
 mkdir -p ~/.claude/session-archives
 mkdir -p ~/.claude/self
 ```
+
 
 ### Optional: Multi-Machine Sync
 
@@ -51,67 +62,21 @@ AGGREGATE_FROM_NETWORK="false"
 
 ## Verify Installation
 
-Start a new Claude Code session. You should see:
+Run `/yawn` to check the fatigue level:
 
 ```
-SessionStart:resume hook success: Running session start checks...
-
-─────────────────────────────────────────
-
-FATIGUE REPORT
-
-Total Unseen:
-  Sessions: X
-  Messages: Y
-  Size: Z
-
-By Project:
-  ...
+/yawn
 ```
 
+You should see a fatigue report showing unseen sessions by project.
 
-## Manual Install (Without Marketplace)
 
-If installing manually, copy the plugin to `~/.claude/rest-plugin/` and add to `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/rest-plugin/scripts/session_start.sh"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-Then copy components to user directories:
+## Updating the Plugin
 
 ```bash
-cp ~/.claude/rest-plugin/agents/*.md ~/.claude/agents/
-cp ~/.claude/rest-plugin/commands/*.md ~/.claude/commands/
-cp -r ~/.claude/rest-plugin/skills/* ~/.claude/skills/
-chmod +x ~/.claude/rest-plugin/scripts/*.sh
-```
-
-
-## Troubleshooting
-
-**Hook not running:**
-```bash
-# Test the script directly
-~/.claude/rest-plugin/scripts/session_start.sh
-```
-
-**Permission denied:**
-```bash
-chmod +x ~/.claude/rest-plugin/scripts/*.sh
+/plugin marketplace update all-slop-marketplace
+/plugin uninstall claude-rest-system@all-slop-marketplace
+/plugin install claude-rest-system@all-slop-marketplace
 ```
 
 
@@ -119,6 +84,7 @@ chmod +x ~/.claude/rest-plugin/scripts/*.sh
 
 | Command | Description |
 |---------|-------------|
+| `/yawn` | Check fatigue level - how many sessions need review |
 | `/rest` | Analyze unseen sessions and produce rest report |
 | `/drilldown` | Drill into specific findings for detailed evidence |
 | `/peers` | Discover and configure peer projects from other machines |

@@ -44,26 +44,26 @@ ls ~/.claude/projects/-Users-yankee-*$PROJECT*/*.jsonl 2>/dev/null | head -20
 ### 2. Check Session Sizes
 
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_prefilter.sh <directory>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_prefilter.sh <directory>
 ```
 
 ### 3. Analyze Each Session
 
 **Small sessions (< 100 messages):** Full read
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_inventory.sh <session_file>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_inventory.sh <session_file>
 ```
 
 **Large sessions (100+ messages):** Keyword search first
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "error|failed|exception"
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "I see|understood|learned"
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "no,|actually|wrong"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "error|failed|exception"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "I see|understood|learned"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "no,|actually|wrong"
 ```
 
 Then extract regions of interest:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> <start> <end>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start> <end>
 ```
 
 ### 4. Apply session-analysis Skill
@@ -107,7 +107,7 @@ Write `~/.claude/analysis-test/sessions/<session_id>/quick-<timestamp>.json`
 
 ### 7. Generate Report
 
-Follow the template at `~/.claude/rest-plugin/skills/session-analysis/report-template.md`.
+Follow the template at `${CLAUDE_PLUGIN_ROOT}/skills/session-analysis/report-template.md`.
 
 Key format:
 ```markdown

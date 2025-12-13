@@ -225,7 +225,7 @@ rm -rf ~/.claude/analysis-<name>/
 For large analyses or offline reading, generate an EPUB:
 
 ```bash
-~/.claude/rest-plugin/scripts/rest_build_epub.sh [storage-path]
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
 ```
 
 **Automatic trigger:** If `--epub` is passed OR analysis exceeds 1000 messages, generate EPUB after report.

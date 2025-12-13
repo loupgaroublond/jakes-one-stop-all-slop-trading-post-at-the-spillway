@@ -84,7 +84,7 @@ For each matching finding, get the actual session content:
 jq '.findings[] | select(.id == "T1") | .evidence_range' quick-*.json
 
 # Extract that range from session file
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> <start> <end>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start> <end>
 ```
 
 ### 5. Present Detailed Evidence

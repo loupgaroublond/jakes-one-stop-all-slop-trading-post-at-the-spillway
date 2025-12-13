@@ -18,7 +18,7 @@ Systematic analysis of Claude Code sessions to identify:
 
 First, understand what you're analyzing:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_inventory.sh <session_file>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_inventory.sh <session_file>
 ```
 
 This shows line numbers, message types, and previews. Use this to identify regions of interest.
@@ -29,29 +29,29 @@ Look for signals in the session content:
 
 **Error indicators** - Things went wrong:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "error|failed|exception|Error|Failed"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "error|failed|exception|Error|Failed"
 ```
 
 **Learning moments** - Claude figured something out:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "I see|understood|learned|realized|makes sense"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "I see|understood|learned|realized|makes sense"
 ```
 
 **User corrections** - User had to correct Claude:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "no,|actually|that's wrong|try again"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "no,|actually|that's wrong|try again"
 ```
 
 **Friction points** - Confusion or uncertainty:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "confused|unclear|not sure|don't understand"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "confused|unclear|not sure|don't understand"
 ```
 
 ### 3. Extract Relevant Ranges
 
 When indicators are found, extract the surrounding context:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> <start_line> <end_line>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start_line> <end_line>
 ```
 
 ### 4. Categorize Findings
@@ -67,7 +67,7 @@ For each significant incident, determine:
 Before flagging a finding, check if relevant docs already address it:
 
 ```bash
-~/.claude/rest-plugin/scripts/rest_doc_freshness.sh <doc_file> <session_file>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_doc_freshness.sh <doc_file> <session_file>
 ```
 
 **Interpretation:**
@@ -176,7 +176,7 @@ For sessions with >100 messages, use keyword search first-pass to avoid reading 
 
 Check session sizes before deciding approach:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_prefilter.sh <session_directory>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_prefilter.sh <session_directory>
 ```
 
 Returns JSON array with session_id, message_count, size_bytes, first_timestamp for each session.
@@ -187,10 +187,10 @@ For large sessions, search BEFORE reading:
 
 ```bash
 # Run all indicator searches
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "error|failed|exception|Error|Failed"
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "I see|understood|learned|realized"
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "no,|actually|that's wrong|try again"
-~/.claude/rest-plugin/scripts/rest_session_search.sh <session_file> "confused|unclear|not sure"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "error|failed|exception|Error|Failed"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "I see|understood|learned|realized"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "no,|actually|that's wrong|try again"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "confused|unclear|not sure"
 ```
 
 Collect all line numbers that matched. These are your "regions of interest."
@@ -212,9 +212,9 @@ Ranges: [18-33], [40-58], [115-130]
 
 Only read the identified ranges:
 ```bash
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> 18 33
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> 40 58
-~/.claude/rest-plugin/scripts/rest_session_extract.sh <session_file> 115 130
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> 18 33
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> 40 58
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> 115 130
 ```
 
 Analyze extracted content. This avoids reading 5000 lines when only 50 are relevant.
