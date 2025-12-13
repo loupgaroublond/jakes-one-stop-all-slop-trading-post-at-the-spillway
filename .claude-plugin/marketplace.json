@@ -36,18 +36,19 @@
       }
     },
     {
-      "name": "claude-self-improvement",
-      "displayName": "Claude Self-Improvement Toolkit",
-      "description": "Teaching an AI to teach itself! Meta-cognitive toolkit for session reflection, config optimization, and continuous improvement. It's like therapy for Claude! (Probably!)",
+      "name": "claude-rest-system",
+      "displayName": "Claude Rest System",
+      "description": "Look at Claude go! Working 24/7, never sleeping! But even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
       "version": "1.0.0",
       "author": "All-Slop Marketplace",
-      "source": "./plugins/claude-self-improvement",
-      "keywords": ["meta", "self-improvement", "reflection", "configuration", "optimization", "analysis"],
+      "source": "./plugins/claude-rest-system",
+      "keywords": ["session-analysis", "fatigue-management", "self-improvement", "multi-machine-sync", "reflection", "rest"],
       "license": "MIT",
       "components": {
-        "commands": ["reflect", "session-stats", "optimize-config"],
-        "agents": ["config-analyzer"],
-        "skills": ["config-optimizer"]
+        "commands": ["rest", "drilldown", "peers"],
+        "agents": ["rest-analyzer", "recommendations-assembler", "test-analyzer"],
+        "skills": ["session-analysis"],
+        "hooks": ["SessionStart"]
       }
     },
     {

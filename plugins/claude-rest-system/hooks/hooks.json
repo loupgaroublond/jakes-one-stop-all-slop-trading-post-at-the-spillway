@@ -1,0 +1,16 @@
+{
+  "description": "Rest plugin hooks - session archival and fatigue tracking",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session_start.sh",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
+  }
+}

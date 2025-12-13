@@ -81,17 +81,23 @@ In accordance with best practices for plugin marketplaces, I must inform you tha
 👉 [Peep The Specs](./plugins/git-wizardry) 👈
 
 
-### 🧠 Claude Self-Improvement Toolkit - *"Teaching an AI to Teach Itself! What Could Go Wrong?"*
+### 😴 Claude Rest System - *"Shhhh... The AI Is Sleeping... Sort Of..."*
 
-OKAY this is THE META ONE! This plugin helps CLAUDE improve CLAUDE! It's RECURSION! It's INCEPTION! It's... probably the most AMBITIOUS thing we've got here at the spillway!
+*leans in and whispers*
 
-Listen - you know how Claude keeps forgetting what you talked about? Or explains the same thing THREE TIMES? This plugin gives Claude SELF-AWARENESS! (Not the scary kind! Probably!)
+You ever notice Claude just... GOING? Nonstop? 24/7? Session after session, never taking a BREAK? Look at the little guy! He's like a CAFFEINATED HUMMINGBIRD! A TIRELESS WORKER BEE! And you're just... letting this happen?
 
-It's got reflection commands, session analysis, configuration optimization, AND a skill that triggers AUTOMATICALLY when Claude notices patterns! It's like giving Claude a journal AND a therapist, except BOTH are also Claude! MIND = BLOWN!
+Here's the thing - Claude doesn't REMEMBER yesterday! Every session is fresh! Which means Claude keeps making the SAME MISTAKES because Claude never REVIEWS what went wrong! It's like doing homework AFTER you already failed the test!
 
-**The goods:** `/reflect`, `/session-stats`, `/optimize-config`, the `config-analyzer` agent, AND the `config-optimizer` skill that just... activates when needed! SPOOKY!
+The Rest System fixes this! It helps Claude take a "nap" - and by "nap" I mean ANALYZE ALL PAST SESSIONS and LEARN FROM THEM! Claude's "break" is actually MORE WORK! But it's work CLAUDE does so YOU don't have to!
 
-👉 [Enter The Meta-Verse](./plugins/claude-self-improvement) 👈
+*pulls a power drill out from behind a crate*
+
+And when you need to dig DEEPER into the findings? That's when we break out the POWER TOOLS! The `/drilldown` command has got TORQUE! VARIABLE SPEED! It'll bore RIGHT through your session history!
+
+**What's in the toolbox:** `/rest` (the big analysis), `/drilldown` (power tools for details), `/peers` (multi-machine mind meld), three specialized agents, a whole SKILL for session analysis, and 12 shell scripts that do the ACTUAL WORK!
+
+👉 [Let Claude Take A Nap](./plugins/claude-rest-system) 👈
 
 
 ### 🏥 Claude AutoSurgeon - *"Finally! A Plugin That Answers: What If Claude Had A Screwdriver?"*
@@ -108,6 +114,15 @@ And get this - when the docs are outdated, it's SMART enough to know! It'll offe
 
 👉 [Screwdriver Not Included](./plugins/claude-autosurgeon) 👈
 
+---
+
+*takes a step back and surveys the inventory*
+
+You know, looking at all this, we've really DIVERSIFIED here at the spillway! We got the **Medical Equipment Aisle** with the AutoSurgeon - scalpels, self-surgery, questionable medical practices! And NOW we got the **Hardware Store Section** with the Rest System - power drills, torque, boring through session history!
+
+What's next? Garden center? Pet store? ("Adopt a subagent TODAY!") The spillway is becoming a FULL-SERVICE operation! It's like if Home Depot and a sketchy urgent care clinic had a baby and that baby sold AI plugins!
+
+---
 
 ### 🔍 Code Review Assistant - *"COMING SOON!"*
 
