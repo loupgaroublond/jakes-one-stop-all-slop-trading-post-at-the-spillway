@@ -34,7 +34,7 @@
     {
       "name": "claude-rest-system",
       "description": "Look at Claude go! Working 24/7, never sleeping! But even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
-      "version": "1.0.1",
+      "version": "1.0.2",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"

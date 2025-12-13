@@ -1,5 +1,4 @@
 {
-  "description": "Rest plugin hooks - session archival and fatigue tracking",
   "hooks": {
     "SessionStart": [
       {
