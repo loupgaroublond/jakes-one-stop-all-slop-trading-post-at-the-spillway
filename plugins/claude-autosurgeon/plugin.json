@@ -1,6 +1,6 @@
 {
   "name": "claude-autosurgeon",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "SELF-SURGERY for Claude Code! Modify settings, slash commands, skills, hooks, and MCP servers with CACHED DOCS! (No medical license required!)",
   "author": "Jake's All-Slop Trading Post",
   "homepage": "https://github.com/jakes-trading-post/plugins",

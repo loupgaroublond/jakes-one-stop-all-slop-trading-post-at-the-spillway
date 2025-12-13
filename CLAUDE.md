@@ -453,6 +453,38 @@ To Pratchett, to Yankovic, to the eternal churn of internet meme culture, and to
 
 ---
 
+## Plugin Release Checklist
+
+When making changes to a plugin, **always bump the version** before pushing:
+
+### Version Locations (keep in sync!)
+
+For each plugin, versions live in TWO places:
+
+1. **Plugin manifest**: `plugins/{plugin-name}/plugin.json` → `version` field
+2. **Marketplace catalog**: `.claude-plugin/marketplace.json` → find plugin entry → `version` field
+
+### Versioning Rules
+
+- **Patch** (0.1.0 → 0.1.1): Bug fixes, typos, minor tweaks
+- **Minor** (0.1.0 → 0.2.0): New features, doc updates, non-breaking changes
+- **Major** (0.1.0 → 1.0.0): Breaking changes, major rewrites
+
+### Before Every Push
+
+```
+[ ] Bump version in plugins/{name}/plugin.json
+[ ] Bump version in .claude-plugin/marketplace.json (same version!)
+[ ] Commit message mentions the version bump
+```
+
+### Why This Matters
+
+Users need to uninstall/reinstall to get updates. If the version doesn't change, they might think they have the latest when they don't. Version bumps are cheap - do them liberally.
+
+
+---
+
 *Now get out there and write some SLOP!*
 
 *It's QUALITY slop! (It's not quality slop!)*
