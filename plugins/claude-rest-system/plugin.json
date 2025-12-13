@@ -1,29 +1,14 @@
 {
   "name": "claude-rest-system",
   "version": "1.0.0",
-  "displayName": "Claude Rest System",
   "description": "Look at Claude go! Working 24/7, never sleeping! But you know what they say - even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
   "author": {
     "name": "Jake's All-Slop Trading Post",
     "email": "marketplace@allslop.dev"
   },
-  "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway/tree/main/plugins/claude-rest-system",
+  "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
   "repository": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
   "license": "MIT",
-  "keywords": [
-    "session-analysis",
-    "fatigue-management",
-    "self-improvement",
-    "multi-machine-sync",
-    "reflection",
-    "rest",
-    "nap"
-  ],
-  "engines": {
-    "claudeCode": ">=0.5.0"
-  },
-  "commands": "./commands/",
-  "agents": "./agents/",
-  "skills": "./skills/",
+  "keywords": ["session-analysis", "fatigue-management", "self-improvement", "reflection", "rest"],
   "hooks": "./hooks/hooks.json"
 }
