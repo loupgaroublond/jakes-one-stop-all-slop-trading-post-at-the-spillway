@@ -92,7 +92,7 @@ For storage location, select `User settings` since you're logging to your home
 directory. This hook will then apply to all projects, not just your current
 project.
 
-Then press Esc until you return to the REPL. Your hook is now registered!
+Then press `Esc` until you return to the REPL. Your hook is now registered.
 
 ### Step 5: Verify your hook
 
@@ -331,3 +331,8 @@ Block edits to sensitive files:
 * For comprehensive security best practices and safety guidelines, see [Security Considerations](/en/hooks#security-considerations) in the hooks reference documentation.
 * For troubleshooting steps and debugging techniques, see [Debugging](/en/hooks#debugging) in the hooks reference
   documentation.
+
+
+---
+
+> To find navigation and other pages in this documentation, fetch the llms.txt file at: https://code.claude.com/docs/llms.txt
