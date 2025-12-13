@@ -44,7 +44,18 @@ Making the SAME mistakes over and over because you never took the time to look a
 That's the REAL fatigue! The SPIRITUAL fatigue! The "I've suggested using `grep` in bash instead of the Grep tool SEVENTEEN TIMES" kind of fatigue!
 
 
-## The Three Magic Words: `/rest`, `/drilldown`, `/peers`
+## The Four Magic Words: `/yawn`, `/rest`, `/drilldown`, `/peers`
+
+### `/yawn` - Check The Fatigue Level
+
+*yawns*
+
+Before you commit to a full rest session, maybe you just want to know: how TIRED is Claude? How many sessions are piling up like unread emails?
+
+That's what `/yawn` is for! It checks the fatigue level - counts up all the unseen sessions by project and tells you how much cognitive debt has accumulated. It's like stepping on a scale, but for SESSION BACKLOG!
+
+Run it, see the numbers, decide if it's time for a real `/rest` or if you can keep pushing. (Spoiler: you can always keep pushing. But SHOULD you?)
+
 
 ### `/rest` - The Big One
 
@@ -53,10 +64,9 @@ This is it. The main event. The POWER NAP.
 When you run `/rest`, here's what happens:
 
 1. All your sessions get ARCHIVED (gotta preserve those memories!)
-2. Claude calculates the FATIGUE LEVEL (how many sessions haven't been reviewed)
-3. Analysis happens! Subagents spawn! Learning occurs!
-4. A report comes out with findings grouped by domain
-5. Recommendations are assembled for what to fix
+2. Analysis happens! Subagents spawn! Learning occurs!
+3. A report comes out with findings grouped by domain
+4. Recommendations are assembled for what to fix
 
 It's like sending Claude to a retreat! A LEARNING RETREAT! Except the retreat is at a spillway and the guru is... also Claude! It's Claudes all the way down!
 

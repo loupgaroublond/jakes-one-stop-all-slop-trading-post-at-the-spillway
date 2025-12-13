@@ -95,7 +95,7 @@ The Rest System fixes this! It helps Claude take a "nap" - and by "nap" I mean A
 
 And when you need to dig DEEPER into the findings? That's when we break out the POWER TOOLS! The `/drilldown` command has got TORQUE! VARIABLE SPEED! It'll bore RIGHT through your session history!
 
-**What's in the toolbox:** `/rest` (the big analysis), `/drilldown` (power tools for details), `/peers` (multi-machine mind meld), three specialized agents, a whole SKILL for session analysis, and 12 shell scripts that do the ACTUAL WORK!
+**What's in the toolbox:** `/yawn` (check fatigue level), `/rest` (the big analysis), `/drilldown` (power tools for details), `/peers` (multi-machine mind meld), three specialized agents, a whole SKILL for session analysis, and 12 shell scripts that do the ACTUAL WORK!
 
 👉 [Let Claude Take A Nap](./plugins/claude-rest-system) 👈
 
