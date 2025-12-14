@@ -59,10 +59,15 @@ get_analyzed_count() {
 }
 
 # Function to extract project name from file path
+# For other-machines, includes machine name: "machine:project"
 get_project_name() {
     local file="$1"
-    # Extract the project directory name (immediate subdirectory of projects/ or session-archives/)
-    if [[ "$file" =~ /projects/([^/]+)/ ]]; then
+    # Check for other-machines path first
+    if [[ "$file" =~ /session-archives/other-machines/([^/]+)/([^/]+)/ ]]; then
+        local machine="${match[1]}"
+        local project="${match[2]}"
+        echo "${machine}:${project}"
+    elif [[ "$file" =~ /projects/([^/]+)/ ]]; then
         echo "${match[1]}"
     elif [[ "$file" =~ /session-archives/([^/]+)/ ]]; then
         echo "${match[1]}"
