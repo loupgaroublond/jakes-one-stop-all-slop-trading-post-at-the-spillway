@@ -10,7 +10,7 @@
     {
       "name": "productivity-pack",
       "description": "You'll be SO productive, you'll forget to eat! Pomodoro timers, note-taking, daily standups - it's like a Swiss Army knife for your workflow!",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
@@ -22,7 +22,7 @@
     {
       "name": "git-wizardry",
       "description": "It's like magic, but with more merge conflicts! Smart commits, branch cleanup, and a git-expert agent that knows git better than YOU do! (No offense!)",
-      "version": "1.0.0",
+      "version": "2.0.0",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"

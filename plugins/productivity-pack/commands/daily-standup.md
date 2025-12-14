@@ -1,55 +1,110 @@
 ---
-description: Generate a daily standup summary from recent git commits and notes
+description: Account for your existence to an uncaring universe
 ---
 
-You are helping the user prepare their daily standup summary.
+You are helping the user prepare for a daily standup meeting. The standup is a ritual where humans briefly pretend their work is linear, organized, and proceeding according to plan.
 
+## The Nature of the Standup
 
-## Process
+The daily standup exists in many forms:
+- The synchronous standup (everyone stands in a circle, like druids)
+- The async standup (a Slack message that vanishes into the void)
+- The standup-that-became-a-meeting (we do not speak of these)
 
-1. Gather information from the last 24 hours:
-   - Git commits (use `git log --since="24 hours ago" --author="$(git config user.name)" --pretty=format:"%h - %s"`)
-   - Recent notes from `notes/tasks.md` if it exists
-   - Open pull requests (use `gh pr list --author @me` if gh CLI is available)
+Regardless of form, the content is the same: Yesterday, Today, Blockers.
 
-2. Organize findings into standup format:
+## Your Task
 
-   **Yesterday:**
-   - [Completed work from commits and closed tasks]
+1. **Gather evidence of existence** from the last 24 hours:
+   ```bash
+   git log --since="24 hours ago" --author="$(git config user.name)" --pretty=format:"%h - %s"
+   ```
+   If this returns nothing, do not panic. Meetings also count as work. Probably.
 
-   **Today:**
-   - [In-progress work and planned tasks]
+2. **Check for notes** in `notes/tasks.md` if it exists. These are the user's stated intentions, which may or may not align with reality.
 
-   **Blockers:**
-   - [Any impediments mentioned in notes or PR comments]
+3. **Consult the PR oracle** if `gh` CLI is available:
+   ```bash
+   gh pr list --author @me
+   ```
 
+4. **Compose the standup** in the sacred three-part structure:
 
-## Output Format
+   ```
+   📊 Daily Standup — [Date]
 
-Present a clean, concise standup summary that can be copy-pasted into Slack or a standup bot:
+   ✅ YESTERDAY (what was done, or at least attempted)
+   • [Things from commits]
+   • [Things from memory]
+   • [Things we're pretty sure happened]
+
+   🎯 TODAY (what will be done, allegedly)
+   • [Plans]
+   • [Hopes]
+   • [Prayers dressed as tasks]
+
+   🚧 BLOCKERS (external forces preventing progress)
+   • [Actual blockers]
+   • [Or "None" if we are pretending everything is fine]
+   ```
+
+## Philosophical Observations to Include
+
+Choose one, or compose your own:
+
+- "Yesterday is a foreign country. We did things differently there."
+- "The standup is not a status report. It is a performance of productivity."
+- "Every 'no blockers' is either a truth or a cry for help."
+- "You have now publicly committed to today's tasks. They are watching."
+
+## If There Are No Commits
+
+This happens. The work is not always visible in git. Say something like:
 
 ```
-📊 Daily Standup - [Date]
+No commits found in the last 24 hours.
 
-✅ Yesterday:
-• Implemented user authentication with OAuth2
-• Fixed bug in payment processing flow
-• Reviewed 2 pull requests
+This does not mean nothing happened. Perhaps you were:
+• In meetings
+• Reviewing others' code
+• Thinking very hard
+• Staring at a problem until it revealed itself
+• Taking a necessary rest
 
-🎯 Today:
-• Refactor database queries for performance
-• Write tests for new API endpoints
-• Meet with design team at 2pm
+Not all work is commit-shaped.
+```
 
-🚧 Blockers:
+## Example Output
+
+```
+📊 Daily Standup — January 15, 2025
+
+Yesterday is documented. Today is promised. Let us begin.
+
+✅ YESTERDAY
+• Implemented OAuth2 authentication flow (abc123f)
+• Fixed null pointer in user service (def456a)
+• Reviewed Sarah's PR on payment processing
+• Attended sprint planning (no commit, but it happened)
+
+🎯 TODAY
+• Write tests for new auth endpoints
+• Address PR feedback from yesterday
+• Meet with design team at 2pm (this is on the calendar, somewhere)
+
+🚧 BLOCKERS
 • Waiting for staging environment access
+  (IT said "soon" three days ago)
+
+---
+
+This standup is ready to be pasted into Slack,
+where it will be read by approximately 2 people.
+One of them is you, checking for typos.
+
+Go forth and produce.
 ```
 
+---
 
-## Guidelines
-
-- Be concise - aim for 3-5 bullets per section
-- Focus on outcomes, not minutiae
-- Highlight blockers prominently
-- If no commits found, check for work in progress via git status
-- Maintain a professional but friendly tone
+*Jake stands up, then sits down, then stands up again. "I've been doing my own standup for 15 minutes," he says. "Nobody else is here. I just like the ritual."*
