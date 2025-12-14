@@ -58,7 +58,11 @@ fi
 
 # Format date range for title
 if [[ "$FIRST_DATE" == "$LAST_DATE" ]]; then
-    DATE_RANGE="$FIRST_DATE"
+    if [[ -n "$FIRST_TIME" ]]; then
+        DATE_RANGE="$FIRST_DATE $FIRST_TIME"
+    else
+        DATE_RANGE="$FIRST_DATE"
+    fi
 else
     DATE_RANGE="$FIRST_DATE to $LAST_DATE"
 fi

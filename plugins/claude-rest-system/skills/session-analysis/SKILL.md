@@ -155,6 +155,11 @@ For mistakes with multiple occurrences:
 - Include [M#n-m] references for drill-down
 - End domain sections with brief observation if warranted
 - End each finding with drill-down keywords in italics
+- **Include callout annotations** for each finding:
+  - `*Pattern:*` - For learnings: describe the reusable approach or technique discovered
+  - `*Friction:*` - For mistakes/issues: explain the underlying UX or design problem
+  - `*Mistake:*` - For repeated errors: note what guidance would prevent recurrence
+  - `*Drill-down:*` - Always: comprehensive keywords for deeper investigation
 
 ### Report Format
 

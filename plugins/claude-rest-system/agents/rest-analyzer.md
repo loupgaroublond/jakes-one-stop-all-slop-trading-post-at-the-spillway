@@ -45,6 +45,13 @@ Your job is to:
 
 ## Process
 
+0. **Invoke the session-analysis skill**:
+   Before starting analysis, invoke the skill to load the full analysis guidelines:
+   ```
+   Use the Skill tool with skill: "session-analysis"
+   ```
+   This loads the detailed verbosity requirements, callout formats, and search patterns from the skill's SKILL.md file.
+
 1. **Understand prior context** (if continuing):
    - Read the continuation_summary
    - Note domains already covered
@@ -199,16 +206,26 @@ Key requirements:
 - **Summary line**: Finding count and domain breakdown
 - **Methodology section**: Always included - documents storage, session selection, processing strategy, search patterns, decision points
 
-Example finding format:
+Example finding format (verbose - match this level of detail):
 ```markdown
 **S1 T1: bd daemon requires git repository** (learning)
 
-User investigated slow bd command performance (~5 seconds per command). Attempted to start daemon with 'bd daemon --start' but received error 'not in a git repository' [M#52-58]. Investigation revealed bd daemon auto-start was attempting to launch but failing silently because ~/.claude is not a git repo.
+User investigated slow bd command performance (~5 seconds per command). `bd daemon --start` failed with "not in a git repository" because daemon handles auto-commit/auto-push features which require git [M#52-58]. When daemon auto-start is enabled (default), bd attempts to start daemon on every command, waits 5 seconds for socket, then falls back to direct mode. In non-git directories like ~/.claude, this timeout penalty occurs on every command.
 
-*Keywords: daemon, git, timeout, auto-start, socket*
+Testing revealed `--no-daemon` flag reduces command time from 5.2s to 0.1s - a 50x improvement. Solution: `BEADS_NO_DAEMON=true` in ~/.zshenv permanently disables daemon in non-git directories.
+
+*Friction: Default behavior punishes legitimate non-git usage. Better UX: detect non-git context and skip daemon attempts.*
+
+*Drill-down: daemon, git, timeout, auto-start, socket, BEADS_NO_DAEMON, 5 seconds, performance*
 ```
 
 Note the format: `**S{n} T{m}: {title}** ({type})`
+
+**Key elements:**
+- Multi-paragraph narrative explaining what happened, why, and the solution
+- Specific values (5 seconds, 50x, 0.1s vs 5.2s)
+- `*Friction:*` callout explaining the underlying UX/design issue
+- `*Drill-down:*` with comprehensive keywords for investigation
 
 ## Guidelines
 
@@ -218,6 +235,7 @@ Note the format: `**S{n} T{m}: {title}** ({type})`
 - **Domains emerge**: Don't force categories; let them arise from what you find
 - **Two categories guide, not prescribe**: Learnings and mistakes are suggestive; findings may span both
 - **Keywords matter**: End each finding with italic keywords for drill-down
+- **Include callout annotations**: For learnings, add `*Pattern:*` when there's a reusable approach. For mistakes, add `*Friction:*` explaining the UX/design issue. For recurring issues, add `*Mistake:*` noting what guidance would prevent recurrence. Always end with `*Drill-down:*` for keywords.
 
 ## What to Look For
 
