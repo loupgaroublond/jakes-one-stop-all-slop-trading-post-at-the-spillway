@@ -25,6 +25,38 @@ Determine which project to analyze based on current working directory:
 
 When running from `~/.claude`, analyze only `.claude` sessions.
 
+### 2.5. Initialize Storage
+
+Determine storage path based on `--storage` flag:
+- Default: `~/.claude/analysis/`
+- With `--storage <name>`: `~/.claude/analysis-<name>/`
+
+**If storage exists and versioning/stashing requested:**
+1. Find highest existing version:
+   ```bash
+   ls -d ~/.claude/analysis-<name>.v* 2>/dev/null | sed 's/.*\.v//' | sort -n | tail -1
+   ```
+2. Increment to next version number
+3. Move existing storage:
+   ```bash
+   mv ~/.claude/analysis-<name> ~/.claude/analysis-<name>.vN
+   ```
+
+**Create fresh storage structure:**
+```bash
+rm -rf ~/.claude/analysis-<name>/sessions ~/.claude/analysis-<name>/reports ~/.claude/analysis-<name>/inventory
+mkdir -p ~/.claude/analysis-<name>/sessions
+mkdir -p ~/.claude/analysis-<name>/reports
+mkdir -p ~/.claude/analysis-<name>/inventory
+```
+
+**Verify pristine state before proceeding:**
+- `sessions/` must be empty
+- `reports/` must be empty (no leftover rest-*.md files from prior runs)
+- `inventory/` must be empty
+
+This ensures each analysis run starts clean and reports don't accumulate across runs.
+
 ### 3. Discover Unseen Sessions
 
 Find all session files for this project (both regular sessions and agent logs):
