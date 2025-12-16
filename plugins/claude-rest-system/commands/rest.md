@@ -419,11 +419,10 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
 
 **EPUB includes (in order):**
 1. Book info and table of contents
-2. Final report (`rest-*.md`) - includes cross-session patterns inline
+2. Final report (`rest-*.md`)
 3. Recommendations (`recommendations-*.md`)
-4. Session reports (`session-reports/*.md`) - appendix for drill-down
-
-Note: Pattern reports are NOT included separately since they're already incorporated into the final report. This avoids duplication.
+4. Pattern reports (`pattern-reports/*.md`)
+5. Session reports (`session-reports/*.md`) - as appendix
 
 ### 11. Update Metadata
 
@@ -536,12 +535,11 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
 **Output:** `{storage}/reports/REST-ANALYSIS.epub` - opens automatically in Books.app.
 
 The EPUB includes:
-- Final rest analysis report (with cross-session patterns inline)
+- Final rest analysis report
 - Recommendations
-- Session reports (appendix for drill-down evidence)
+- Pattern consolidation reports
+- Session reports (as appendix)
 - Table of contents for navigation
-
-Pattern reports are incorporated into the final report, not duplicated separately.
 
 ## Drill-Down
 
