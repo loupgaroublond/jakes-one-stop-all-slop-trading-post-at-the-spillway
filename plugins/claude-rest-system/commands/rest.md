@@ -6,6 +6,20 @@ description: Analyze unseen sessions and produce rest report
 
 You are running the Rest System - a session analysis workflow that reviews prior sessions to identify learnings and mistakes.
 
+## Workflow Overview
+
+```
+Sessions → Session Analyzers → Session Reports (narrative markdown)
+                                      ↓
+                              Pattern Identification
+                                      ↓
+                Pattern Consolidators (parallel) → Pattern Reports
+                                      ↓
+                         Recommendations Assembler
+                                      ↓
+                              Final Report + EPUB
+```
+
 ## Workflow
 
 ### 1. Archive and Fatigue Check
@@ -46,13 +60,14 @@ Determine storage path based on `--storage` flag:
 ```bash
 rm -rf ~/.claude/analysis-<name>/sessions ~/.claude/analysis-<name>/reports ~/.claude/analysis-<name>/inventory
 mkdir -p ~/.claude/analysis-<name>/sessions
-mkdir -p ~/.claude/analysis-<name>/reports
+mkdir -p ~/.claude/analysis-<name>/reports/session-reports
+mkdir -p ~/.claude/analysis-<name>/reports/pattern-reports
 mkdir -p ~/.claude/analysis-<name>/inventory
 ```
 
 **Verify pristine state before proceeding:**
 - `sessions/` must be empty
-- `reports/` must be empty (no leftover rest-*.md files from prior runs)
+- `reports/` must be empty (no leftover files from prior runs)
 - `inventory/` must be empty
 
 This ensures each analysis run starts clean and reports don't accumulate across runs.
@@ -102,83 +117,322 @@ The orchestrator assigns ALL serial numbers before analysis begins:
 
 **Pass to subagents:** Include `session_serial: "S3"` or `session_serial: "S3 A2"` when spawning rest-analyzer
 
-### 5. Analyze Sessions
+### 5. Analyze Sessions (NARRATIVE OUTPUT)
 
 For each unseen session, spawn rest-analyzer subagent with:
 - `session_file`: Path to JSONL
 - `storage_path`: Analysis storage location (e.g., `~/.claude/analysis-preprod/`)
 - `session_serial`: The S number (e.g., "S3")
 
-Subagents assign T numbers (T1, T2...) to findings within their session.
+**CRITICAL: Subagents produce NARRATIVE MARKDOWN REPORTS, not JSON.**
 
-**Small sessions** (< 100 messages): Read and analyze in single pass
+**Session Report Standards:**
 
-**Large sessions**:
-- Use keyword search first-pass to find regions of interest
-- Extract and analyze targeted ranges
-- If context fills, spawn continuation subagent
+Each session analyzer writes a markdown report to:
+`{storage_path}/reports/session-reports/{session-serial}-report.md`
 
-**Subagent output locations:**
-```
-{storage_path}/sessions/{session-id}/
-├── metadata.json                        # Session metadata with S number
-├── findings-{agent-id}-{timestamp}.json # Findings from this subagent
-└── partial-{agent-id}-{timestamp}.json  # (if continuation needed)
-```
+**Required report structure:**
 
-Subagents include their agent ID in filenames for traceability.
-Each subagent writes directly to storage BEFORE returning.
-
-### 6. Generate Draft Report
-
-Aggregate findings across all analyzed sessions into a draft report (without recommendations).
-
-**Draft report format** (consolidated by domain):
 ```markdown
-# Rest Analysis: {date} {time}
+# Session {serial}: {Brief Title}
 
-Analyzed sessions S{n}-S{m}, {total} messages.
+**Session ID:** {id}
+**Messages:** {count}
+**Source:** {local|icloud|peer:machine}
+**Date:** {timestamp range}
 
-## {Domain}
+## Summary
 
-**{Finding Title}** (S{n}, S{m})
-{Narrative about what happened, citing specific incidents with [M#start-end] references}
+{2-3 paragraph narrative overview of what happened in this session. What was the user trying to accomplish? What were the major activities? How did it go?}
 
-*{Brief inline hint if warranted, e.g., "may need CLAUDE.md reinforcement"}*
+## Findings
+
+### {Finding Title} (T1)
+
+{Full narrative description of what happened. Include:
+- The context leading up to the event
+- What actually occurred
+- How it was resolved or what the outcome was
+- Why this matters for future sessions}
+
+**Session excerpt (M#{start}-{end}):**
+
+> User: {actual message content}
+>
+> Assistant: {actual response content}
+>
+> User: {follow-up showing correction or resolution}
+
+**Keywords:** `keyword1`, `keyword2`, `keyword3`
 
 ---
 
-*{count} findings across {count} domains. Request drill-down on any item for full evidence.*
+### {Next Finding Title} (T2)
+
+{Continue with same narrative depth...}
+
+## Session Characteristics
+
+- **Complexity:** {simple|moderate|complex}
+- **Dominant themes:** {list}
+- **Error density:** {low|medium|high}
+- **Learning density:** {low|medium|high}
+- **User corrections:** {count}
+
+## Potential Pattern Connections
+
+{Note any patterns that might connect to other sessions:
+- "AMI naming confusion similar to other infrastructure sessions"
+- "Google Docs index issues likely recurring pattern"
+- "Same kubectl namespace assumption error seen elsewhere"}
 ```
 
-### 7. Assemble Recommendations
+**Findings Quality Bar:**
 
-Spawn **recommendations-assembler** subagent with:
-- `draft_report`: The draft report content (findings only)
-- `storage_path`: Analysis storage path for drill-down access
+- Sessions > 500 messages: Expect 2-3 findings minimum, use keyword-search-first
+- Sessions 100-500 messages: Expect 1-2 findings minimum
+- Sessions < 100 messages: 0-1 findings acceptable
+- If no findings after thorough search: Document as "Reviewed - routine work" with brief summary
+- **Never** write "deferred due to token constraints" - use continuation protocol instead
+
+**Large Session Strategy:**
+
+For sessions > 500 messages:
+1. Run keyword search first-pass to identify regions of interest
+2. Extract and deeply analyze targeted ranges
+3. **If context fills before complete: Return `continuation_needed: true` with progress marker**
+4. Orchestrator will spawn continuation subagent
+
+**Continuation Protocol:**
+```markdown
+## Analysis Status
+
+**Status:** Partial (continuation needed)
+**Analyzed through:** M#{last_message}
+**Remaining:** M#{next_message}-{end}
+**Findings so far:** {count}
+```
+
+### 6. Identify Common Patterns
+
+After all session reports are complete, the orchestrator:
+
+1. Read all session reports from `{storage}/reports/session-reports/`
+2. Extract "Potential Pattern Connections" sections
+3. Identify patterns mentioned across multiple sessions
+4. Group related findings by theme
+
+**Pattern identification criteria:**
+- Same issue mentioned in 2+ session reports
+- Similar keywords appearing across sessions
+- Related domain (infrastructure, MCP, Google Docs, etc.)
+- Connected error types or user correction patterns
+
+**Build pattern work queue:**
+```
+Pattern: "AMI naming confusion"
+  - S35: T2 (zkube 1.0 vs 2.0 AMI storage)
+  - S35: T4 (current vs target AMI confusion)
+  - S173: T1 (AMI report pipeline issues)
+  Sessions to consolidate: S35-report.md, S173-report.md
+
+Pattern: "Google Docs index shifting"
+  - S66: T1 (index refresh after edits)
+  - S126: T2 (insertion at wrong location)
+  Sessions to consolidate: S66-report.md, S126-report.md
+```
+
+### 7. Consolidate Patterns (PARALLEL)
+
+For each identified pattern, spawn a **pattern-consolidator** subagent:
+
+**Input:**
+- `pattern_name`: e.g., "AMI naming confusion"
+- `session_reports`: List of relevant session report paths
+- `finding_references`: Which findings (T numbers) relate to this pattern
+- `storage_path`: Analysis storage path
+
+**Pattern consolidator task:**
+1. Read the relevant session reports (full narrative, not summaries)
+2. Extract the specific findings related to this pattern
+3. Synthesize a consolidated pattern report that:
+   - Tells the complete story across all sessions
+   - Shows how the pattern manifested differently in each context
+   - Includes representative excerpts from multiple sessions
+   - Identifies root causes and contributing factors
+   - Suggests concrete mitigations
+
+**Pattern Report Standards:**
+
+Write to: `{storage_path}/reports/pattern-reports/{pattern-slug}-consolidated.md`
+
+**Maximum length:** Up to 2x the average length of the contributing session findings.
+
+```markdown
+# Pattern: {Pattern Name}
+
+**Sessions involved:** {S35, S66, S173}
+**Total occurrences:** {count}
+**Severity:** {Critical|High|Medium|Low}
+
+## Pattern Overview
+
+{Comprehensive narrative explaining this pattern. What is it? Why does it happen? How does it manifest?}
+
+## Manifestations
+
+### In Session S35: {Context}
+
+{Narrative of how this pattern appeared in S35, with excerpts}
+
+> User: {excerpt}
+> Assistant: {excerpt}
+
+### In Session S66: {Context}
+
+{Narrative of how this pattern appeared in S66, with excerpts}
+
+### In Session S173: {Context}
+
+{Narrative of how this pattern appeared in S173, with excerpts}
+
+## Root Cause Analysis
+
+{Why does this pattern keep occurring? What are the underlying causes?}
+
+## Impact Assessment
+
+{What are the consequences when this pattern occurs? Time lost? User frustration? Incorrect outputs?}
+
+## Recommended Mitigations
+
+{Specific, actionable suggestions to prevent this pattern:
+- Documentation additions
+- Workflow changes
+- Tool improvements
+- Prompt modifications}
+
+## Keywords for Future Detection
+
+`keyword1`, `keyword2`, `keyword3`
+```
+
+**Spawn pattern consolidators in parallel** - they read different session reports so no conflicts.
+
+### 8. Assemble Recommendations
+
+After pattern reports are complete, spawn **recommendations-assembler** subagent with:
+- `session_reports_dir`: Path to session reports
+- `pattern_reports_dir`: Path to pattern reports
+- `storage_path`: Analysis storage path
 
 The assembler will:
-1. Extract inline hints from findings
-2. Group suggestions by target (CLAUDE.md, scripts, etc.)
-3. Drill down as needed to make suggestions concrete
-4. Deduplicate and merge related suggestions
-5. Return a Recommendations section
+1. Read all session reports and pattern reports (narrative content)
+2. Extract mitigation suggestions from pattern reports
+3. Group recommendations by target (CLAUDE.md, AGENTS.md, scripts, etc.)
+4. Prioritize by severity and frequency
+5. Write concrete, copy-paste-ready recommendations
+6. Deduplicate and merge related suggestions
 
-**Append the Recommendations section** to the draft report.
+**Recommendations output:**
+Write to: `{storage_path}/reports/recommendations-{timestamp}.md`
 
-### 8. Save Final Report
+### 9. Generate Final Report
 
-Save complete report (findings + recommendations) to:
-`~/.claude/analysis/reports/rest-{YYYY-MM-DD}-{HH-MM}.md` (24-hour local time)
+The orchestrator assembles the final report with **no duplication**:
 
-### 9. Update Metadata
+**Hierarchy principle:** Pattern reports "promote" findings out of session reports. If a finding was consolidated into a pattern, it does NOT appear separately in the final report.
+
+**Content organization:**
+
+1. **Patterns** (consolidated cross-session findings) - Full narrative in final report
+2. **Standalone findings** (single-session, not part of any pattern) - Included in final report
+3. **Consolidated findings** (part of a pattern) - NOT in final report, available via drill-down to session reports
+
+**Example:**
+- S35 T2 (zkube AMI storage) → consolidated into "AMI Confusion" pattern → NOT in final report
+- S35 T4 (current vs target AMI) → consolidated into "AMI Confusion" pattern → NOT in final report
+- S66 T3 (MCP tool limitations) → standalone, no pattern → IN final report
+- "AMI Confusion" pattern report → IN final report (covers S35 T2, T4, S173 T1)
+
+**Structure:**
+```markdown
+# Rest Analysis Report: {date}
+
+## Executive Summary
+{Sessions analyzed, patterns found, standalone findings, key recommendations}
+
+## Cross-Session Patterns
+
+{Full pattern reports - these are the promoted/consolidated findings}
+
+### Pattern: AMI Naming Confusion
+{Full narrative from pattern-reports/ami-confusion-consolidated.md}
+Sessions: S35, S173 | Findings consolidated: S35-T2, S35-T4, S173-T1
+
+### Pattern: Google Docs Index Shifting
+{Full narrative from pattern-reports/google-docs-index-consolidated.md}
+Sessions: S66, S126 | Findings consolidated: S66-T1, S126-T2
+
+## Standalone Findings
+
+{Findings that appeared in only one session and weren't part of any pattern}
+
+### MCP Tool Wrapper Limitations (S66-T3)
+{Narrative from session report, not consolidated into a pattern}
+
+### Kubernetes Namespace Confusion (S113-T1)
+{Narrative from session report, not consolidated into a pattern}
+
+## Recommendations
+
+{Full recommendations section}
+
+## Methodology
+
+{How the analysis was conducted}
+
+## Drill-Down Reference
+
+Session reports available in appendix for detailed evidence:
+- S35: Full report with T1-T4 (T2, T4 consolidated into AMI pattern)
+- S66: Full report with T1-T3 (T1 consolidated into Google Docs pattern)
+- ...
+```
+
+**Save to:** `{storage}/reports/rest-{YYYY-MM-DD}-{HH-MM}.md`
+
+### 10. EPUB Generation and Verification
+
+Before generating EPUB, verify all expected content is present:
+
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
+```
+
+**Pre-flight checks (performed by script):**
+- [ ] At least one `rest-*.md` final report exists
+- [ ] Recommendations file exists if patterns were found
+- [ ] All referenced session reports exist
+- [ ] All referenced pattern reports exist
+- [ ] Total word count exceeds minimum threshold
+
+**EPUB includes (in order):**
+1. Book info and table of contents
+2. Final report (`rest-*.md`) - includes cross-session patterns inline
+3. Recommendations (`recommendations-*.md`)
+4. Session reports (`session-reports/*.md`) - appendix for drill-down
+
+Note: Pattern reports are NOT included separately since they're already incorporated into the final report. This avoids duplication.
+
+### 11. Update Metadata
 
 For each analyzed session, update metadata:
 - Set `analyzed_through_message` to current total
 - Add entry to `analysis_runs` array
 - Set `status` to `complete`
 
-### 10. Present and Await Review
+### 12. Present and Await Review
 
 Display the report and wait for user response. User may:
 - Request drill-down on specific findings
@@ -200,15 +454,33 @@ Use `--storage <name>` to use an alternate storage location:
 - `--storage v2` → `~/.claude/analysis-v2/`
 - `--storage <name>` → `~/.claude/analysis-<name>/`
 
+**Directory structure:**
+```
+~/.claude/analysis-{name}/
+├── inventory/
+│   ├── all_sessions.txt
+│   └── serial_map.jsonl
+├── sessions/
+│   └── {session-id}/
+│       └── metadata.json
+└── reports/
+    ├── session-reports/
+    │   ├── S1-report.md
+    │   ├── S2-report.md
+    │   └── ...
+    ├── pattern-reports/
+    │   ├── ami-confusion-consolidated.md
+    │   ├── google-docs-index-consolidated.md
+    │   └── ...
+    ├── recommendations-{timestamp}.md
+    ├── rest-{timestamp}.md
+    └── REST-ANALYSIS.epub
+```
+
 **Use cases:**
 1. **Test isolation**: Run test analyses without affecting production state
 2. **Re-analysis**: Re-analyze past sessions with evolved methodology while preserving old analysis
 3. **Experiments**: Try different analysis approaches side-by-side
-
-Each storage location has independent:
-- Session metadata and serial numbers
-- Findings files
-- Reports
 
 **Shorthand:** `--test` is equivalent to `--storage test`
 
@@ -227,25 +499,22 @@ Location: `~/.claude/analysis/` (or alternate location if specified)
 - Sessions analyzed: {n}
 - Sessions skipped: {n} (reason if any)
 
-### Session Processing Strategy
-- {How each session was handled: full read vs keyword search}
-- {Regions of interest identified for large sessions}
+### Session Processing
+- Small sessions (< 100 msgs): Full read, single pass
+- Medium sessions (100-500 msgs): Full read with targeted extraction
+- Large sessions (> 500 msgs): Keyword-search-first, then deep dive on regions of interest
+- Massive sessions (> 1000 msgs): Dedicated analyzer with continuation protocol
 
-### Search Patterns Used
-- Error indicators: `error|failed|exception`
-- Learning moments: `I see|understood|learned`
-- User corrections: `no,|actually|wrong`
-- Domain-specific: `{any additional patterns used}`
-
-### Decision Points
-- {Key choices made during analysis and why}
+### Pattern Consolidation
+- Patterns identified: {n}
+- Pattern consolidators spawned: {n}
+- Cross-session themes: {list}
 
 ### Findings Distribution
-- Learning: {count}
-- Mistakes: {count}
+- Total session findings: {count}
+- Total pattern reports: {count}
+- Recommendations generated: {count}
 ```
-
-This metacognition helps understand the analysis approach and improve future iterations.
 
 To clean up non-production storage:
 ```bash
@@ -267,34 +536,50 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
 **Output:** `{storage}/reports/REST-ANALYSIS.epub` - opens automatically in Books.app.
 
 The EPUB includes:
-- All rest-*.md reports in chronological order
-- Table of contents by date
-- Metadata (date range, report count)
+- Final rest analysis report (with cross-session patterns inline)
+- Recommendations
+- Session reports (appendix for drill-down evidence)
+- Table of contents for navigation
+
+Pattern reports are incorporated into the final report, not duplicated separately.
 
 ## Drill-Down
 
 Use `/drilldown` command for detailed evidence on any finding.
 
 ```
-/drilldown M1              # Evidence for finding M1
+/drilldown T1              # Evidence for finding T1
 /drilldown S47             # Full session S47 detail
 /drilldown S47 M#120-135   # Specific message range
+/drilldown pattern:ami     # Pattern report for AMI issues
 ```
 
 ### Breadcrumbs
 
-Every finding MUST include `drill_down_keywords` - specific search terms for `/drilldown`:
+Every finding MUST include actionable drill-down keywords:
 
 **BAD** (vague):
 > "Larger session - would benefit from keyword search first-pass."
 
 **GOOD** (actionable):
-> "Larger session (111 messages). Drill-down: `bd ready`, `bd daemon`, `socket`, `startup time`."
+> "Larger session (111 messages). Keywords: `bd ready`, `bd daemon`, `socket`, `startup time`."
+
+## Quality Gates
+
+Before finalizing analysis:
+
+- [ ] Findings-per-session ratio > 0.4 (excluding tiny sessions)
+- [ ] All sessions > 500 messages have dedicated analysis (not "sampled")
+- [ ] Large sessions use continuation protocol, not "deferred"
+- [ ] Pattern reports exist for themes appearing in 2+ sessions
+- [ ] Recommendations reference specific findings
+- [ ] EPUB pre-flight checks pass
 
 ## Constraints
 
 - Only analyze current project's sessions
 - Keep reports readable in < 30 minutes (query user for large backlogs)
-- Be specific about incidents, not generic
-- Suggestions light, at end of sections
-- No appendices unless truly needed for indexing
+- Be specific about incidents with actual excerpts, not generic summaries
+- Never produce JSON findings - always narrative markdown
+- Never skip large sessions - use continuation protocol
+- Include session excerpts showing actual conversation content
