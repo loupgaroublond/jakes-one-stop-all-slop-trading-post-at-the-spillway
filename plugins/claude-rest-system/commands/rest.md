@@ -213,6 +213,48 @@ For sessions > 500 messages:
 **Findings so far:** {count}
 ```
 
+### 5.5. Verify Coverage (for analyses with 10+ sessions)
+
+**When analyzing more than 10 sessions**, verify comprehensive coverage before proceeding to pattern identification:
+
+**Coverage verification steps:**
+
+1. **Count substantive sessions** (>= 20 messages) from serial_map.jsonl:
+   ```bash
+   jq -r 'select(.messages >= 20) | .serial' {storage}/inventory/serial_map.jsonl | wc -l
+   ```
+
+2. **Count actual reports generated:**
+   ```bash
+   ls {storage}/reports/session-reports/S*-report.md | wc -l
+   ```
+
+3. **Identify gaps** - sessions with >= 20 messages but no report:
+   ```bash
+   for serial in $(seq 1 {max_serial}); do
+     if [[ ! -f {storage}/reports/session-reports/S${serial}-report.md ]]; then
+       jq -r "select(.serial == \"S$serial\") | select(.messages >= 20) | \"\(.serial): \(.messages) msgs\"" \
+         {storage}/inventory/serial_map.jsonl
+     fi
+   done
+   ```
+
+4. **Display coverage summary:**
+   ```
+   === Session Coverage ===
+   Sessions < 20 messages: {n} (skipped as too small)
+   Sessions >= 20 messages: {n}
+     - Analyzed: {n}
+     - Missing: {n}
+   Coverage: {percent}%
+   ```
+
+5. **If gaps exist**, dispatch additional analyzers for missing substantive sessions before proceeding.
+
+**Coverage threshold:** Proceed to pattern identification only when >= 95% of substantive sessions (>= 20 messages) have reports. Any session with >= 100 messages MUST have a report.
+
+**Small session handling:** Sessions with < 20 messages are intentionally skipped - they rarely contain significant findings worth the analysis overhead.
+
 ### 6. Identify Common Patterns
 
 After all session reports are complete, the orchestrator:
@@ -494,9 +536,12 @@ Always include a methodology section at the end of reports:
 Location: `~/.claude/analysis/` (or alternate location if specified)
 
 ### Session Selection
-- Total sessions found: {n}
-- Sessions analyzed: {n}
-- Sessions skipped: {n} (reason if any)
+- Total sessions in inventory: {n}
+- Sessions < 20 messages: {n} (skipped as too small)
+- Substantive sessions (>= 20 msgs): {n}
+  - Analyzed: {n}
+  - Missing: {n}
+- Coverage: {percent}%
 
 ### Session Processing
 - Small sessions (< 100 msgs): Full read, single pass
@@ -566,6 +611,8 @@ Every finding MUST include actionable drill-down keywords:
 
 Before finalizing analysis:
 
+- [ ] **Coverage check passed** (>= 95% of sessions with >= 20 messages have reports)
+- [ ] **No gaps in large sessions** (all sessions >= 100 messages have reports)
 - [ ] Findings-per-session ratio > 0.4 (excluding tiny sessions)
 - [ ] All sessions > 500 messages have dedicated analysis (not "sampled")
 - [ ] Large sessions use continuation protocol, not "deferred"

@@ -58,14 +58,16 @@ else
     echo "[OK] Found $REC_COUNT recommendations file(s)"
 fi
 
-# Check 3: Pattern reports (informational only - they're included in final report)
+# Check 3: Pattern reports
 PATTERN_REPORTS=""
 if [[ -d "pattern-reports" ]]; then
     PATTERN_REPORTS=$(find pattern-reports -name "*.md" -type f 2>/dev/null | sort)
 fi
-if [[ -n "$PATTERN_REPORTS" ]]; then
+if [[ -z "$PATTERN_REPORTS" ]]; then
+    WARNINGS="$WARNINGS\n[WARN] No pattern reports found in pattern-reports/"
+else
     PATTERN_COUNT=$(echo "$PATTERN_REPORTS" | wc -l | tr -d ' ')
-    echo "[INFO] Found $PATTERN_COUNT pattern report(s) (included in final report, not duplicated in EPUB)"
+    echo "[OK] Found $PATTERN_COUNT pattern report(s)"
 fi
 
 # Check 4: Session reports
@@ -95,12 +97,13 @@ fi
 echo ""
 echo "=== Building EPUB ==="
 
-# Count total files to include (pattern reports excluded - they're in final report)
+# Count total files to include
 TOTAL_FILES=0
 [[ -n "$FINAL_REPORTS" ]] && TOTAL_FILES=$((TOTAL_FILES + $(echo "$FINAL_REPORTS" | wc -l)))
 [[ -n "$RECOMMENDATIONS" ]] && TOTAL_FILES=$((TOTAL_FILES + $(echo "$RECOMMENDATIONS" | wc -l)))
+[[ -n "$PATTERN_REPORTS" ]] && TOTAL_FILES=$((TOTAL_FILES + $(echo "$PATTERN_REPORTS" | wc -l)))
 [[ -n "$SESSION_REPORTS" ]] && TOTAL_FILES=$((TOTAL_FILES + $(echo "$SESSION_REPORTS" | wc -l)))
-echo "Total files to include: $TOTAL_FILES (pattern reports already in final report)"
+echo "Total files to include: $TOTAL_FILES"
 
 # Extract date range from final report filenames
 FIRST_REPORT=$(echo "$FINAL_REPORTS" | head -1 | sed 's|^\./||')
@@ -152,9 +155,10 @@ This book contains:
 EOF
 
 # Add content summary
-[[ -n "$FINAL_REPORTS" ]] && echo "- **Final Reports:** $(echo "$FINAL_REPORTS" | wc -l | tr -d ' ') (includes cross-session patterns)" >> REST-ANALYSIS.md
+[[ -n "$FINAL_REPORTS" ]] && echo "- **Final Reports:** $(echo "$FINAL_REPORTS" | wc -l | tr -d ' ')" >> REST-ANALYSIS.md
 [[ -n "$RECOMMENDATIONS" ]] && echo "- **Recommendations:** $(echo "$RECOMMENDATIONS" | wc -l | tr -d ' ')" >> REST-ANALYSIS.md
-[[ -n "$SESSION_REPORTS" ]] && echo "- **Session Reports:** $(echo "$SESSION_REPORTS" | wc -l | tr -d ' ') (appendix for drill-down)" >> REST-ANALYSIS.md
+[[ -n "$PATTERN_REPORTS" ]] && echo "- **Pattern Reports:** $(echo "$PATTERN_REPORTS" | wc -l | tr -d ' ')" >> REST-ANALYSIS.md
+[[ -n "$SESSION_REPORTS" ]] && echo "- **Session Reports:** $(echo "$SESSION_REPORTS" | wc -l | tr -d ' ') (appendix)" >> REST-ANALYSIS.md
 
 cat >> REST-ANALYSIS.md << 'EOF'
 
@@ -190,8 +194,8 @@ if [[ -n "$FINAL_REPORTS" ]]; then
         echo "" >> REST-ANALYSIS.md
         echo "## $chapter_title" >> REST-ANALYSIS.md
         echo "" >> REST-ANALYSIS.md
-        # Skip the first H1 heading if present
-        sed '1{/^# /d;}' "$file" >> REST-ANALYSIS.md
+        # Skip the first H1 heading, demote remaining headings so they don't clutter TOC
+        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> REST-ANALYSIS.md
 
     done <<< "$FINAL_REPORTS"
 fi
@@ -217,15 +221,36 @@ if [[ -n "$RECOMMENDATIONS" ]]; then
         echo "" >> REST-ANALYSIS.md
         echo "## $chapter_title" >> REST-ANALYSIS.md
         echo "" >> REST-ANALYSIS.md
-        sed '1{/^# /d;}' "$file" >> REST-ANALYSIS.md
+        # Demote headings so internal sections don't appear in TOC
+        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> REST-ANALYSIS.md
 
     done <<< "$RECOMMENDATIONS"
 fi
 
-# Pattern reports are NOT included separately - they're already in the final report
-# This avoids duplication since the final report incorporates pattern narratives inline
+# === PART 3: PATTERN REPORTS ===
+if [[ -n "$PATTERN_REPORTS" ]]; then
+    echo "" >> REST-ANALYSIS.md
+    echo "# Part III: Cross-Session Patterns" >> REST-ANALYSIS.md
+    echo "" >> REST-ANALYSIS.md
+    echo "These reports consolidate findings that appeared across multiple sessions." >> REST-ANALYSIS.md
+    echo "" >> REST-ANALYSIS.md
 
-# === PART 3: SESSION REPORTS (APPENDIX) ===
+    while IFS= read -r file; do
+        basename="${file##*/}"
+        basename="${basename%.md}"
+        # Convert slug to title (ami-confusion -> AMI Confusion)
+        chapter_title=$(echo "$basename" | sed 's/-consolidated$//' | sed 's/-/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
+
+        echo "" >> REST-ANALYSIS.md
+        echo "## Pattern: $chapter_title" >> REST-ANALYSIS.md
+        echo "" >> REST-ANALYSIS.md
+        # Demote headings so internal sections don't appear in TOC
+        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> REST-ANALYSIS.md
+
+    done <<< "$PATTERN_REPORTS"
+fi
+
+# === PART 4: SESSION REPORTS (APPENDIX) ===
 if [[ -n "$SESSION_REPORTS" ]]; then
     echo "" >> REST-ANALYSIS.md
     echo "# Appendix: Session Reports" >> REST-ANALYSIS.md
@@ -242,7 +267,8 @@ if [[ -n "$SESSION_REPORTS" ]]; then
         echo "" >> REST-ANALYSIS.md
         echo "## Session $session_num" >> REST-ANALYSIS.md
         echo "" >> REST-ANALYSIS.md
-        sed '1{/^# /d;}' "$file" >> REST-ANALYSIS.md
+        # Demote headings so internal sections (Summary, Findings, Methodology) don't appear in TOC
+        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> REST-ANALYSIS.md
 
     done <<< "$SESSION_REPORTS"
 fi
@@ -293,10 +319,10 @@ echo "Location: $REPORTS_DIR/REST-ANALYSIS.epub"
 echo "Size: $EPUB_SIZE"
 echo "Words: $WORD_COUNT"
 echo "Files included: $TOTAL_FILES"
-[[ -n "$FINAL_REPORTS" ]] && echo "  - Final reports: $(echo "$FINAL_REPORTS" | wc -l | tr -d ' ') (includes patterns)"
+[[ -n "$FINAL_REPORTS" ]] && echo "  - Final reports: $(echo "$FINAL_REPORTS" | wc -l | tr -d ' ')"
 [[ -n "$RECOMMENDATIONS" ]] && echo "  - Recommendations: $(echo "$RECOMMENDATIONS" | wc -l | tr -d ' ')"
-[[ -n "$SESSION_REPORTS" ]] && echo "  - Session reports: $(echo "$SESSION_REPORTS" | wc -l | tr -d ' ') (appendix)"
-[[ -n "$PATTERN_REPORTS" ]] && echo "  (Pattern reports: $(echo "$PATTERN_REPORTS" | wc -l | tr -d ' ') - already in final report)"
+[[ -n "$PATTERN_REPORTS" ]] && echo "  - Pattern reports: $(echo "$PATTERN_REPORTS" | wc -l | tr -d ' ')"
+[[ -n "$SESSION_REPORTS" ]] && echo "  - Session reports: $(echo "$SESSION_REPORTS" | wc -l | tr -d ' ')"
 
 # Open in Books.app
 echo ""

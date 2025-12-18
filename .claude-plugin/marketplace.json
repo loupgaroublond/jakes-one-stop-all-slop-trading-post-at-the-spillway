@@ -16,7 +16,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/productivity-pack",
-      "keywords": ["productivity", "tasks", "notes", "time-tracking"],
+      "keywords": [
+        "productivity",
+        "tasks",
+        "notes",
+        "time-tracking"
+      ],
       "license": "MIT"
     },
     {
@@ -28,19 +33,30 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/git-wizardry",
-      "keywords": ["git", "version-control", "workflow"],
+      "keywords": [
+        "git",
+        "version-control",
+        "workflow"
+      ],
       "license": "MIT"
     },
     {
       "name": "claude-rest-system",
       "description": "Look at Claude go! Working 24/7, never sleeping! But even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/claude-rest-system",
-      "keywords": ["session-analysis", "fatigue-management", "self-improvement", "multi-machine-sync", "reflection", "rest"],
+      "keywords": [
+        "session-analysis",
+        "fatigue-management",
+        "self-improvement",
+        "multi-machine-sync",
+        "reflection",
+        "rest"
+      ],
       "license": "MIT"
     },
     {
@@ -52,7 +68,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/claude-autosurgeon",
-      "keywords": ["offline-docs", "self-modification", "configuration", "meta"],
+      "keywords": [
+        "offline-docs",
+        "self-modification",
+        "configuration",
+        "meta"
+      ],
       "license": "MIT"
     },
     {
@@ -64,7 +85,11 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/code-review-assistant",
-      "keywords": ["code-review", "quality", "best-practices"],
+      "keywords": [
+        "code-review",
+        "quality",
+        "best-practices"
+      ],
       "license": "MIT"
     },
     {
@@ -76,7 +101,11 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/docs-generator",
-      "keywords": ["documentation", "api-docs", "readme"],
+      "keywords": [
+        "documentation",
+        "api-docs",
+        "readme"
+      ],
       "license": "MIT"
     },
     {
@@ -88,7 +117,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/test-automation",
-      "keywords": ["testing", "test-generation", "coverage", "quality"],
+      "keywords": [
+        "testing",
+        "test-generation",
+        "coverage",
+        "quality"
+      ],
       "license": "MIT"
     },
     {
@@ -100,7 +134,11 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/refactor-tools",
-      "keywords": ["refactoring", "code-quality", "modernization"],
+      "keywords": [
+        "refactoring",
+        "code-quality",
+        "modernization"
+      ],
       "license": "MIT"
     },
     {
@@ -112,7 +150,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/debugging-toolkit",
-      "keywords": ["debugging", "errors", "logs", "troubleshooting"],
+      "keywords": [
+        "debugging",
+        "errors",
+        "logs",
+        "troubleshooting"
+      ],
       "license": "MIT"
     },
     {
@@ -124,7 +167,13 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/api-client-generator",
-      "keywords": ["api", "openapi", "swagger", "graphql", "codegen"],
+      "keywords": [
+        "api",
+        "openapi",
+        "swagger",
+        "graphql",
+        "codegen"
+      ],
       "license": "MIT"
     },
     {
@@ -136,7 +185,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/performance-profiler",
-      "keywords": ["performance", "optimization", "profiling", "benchmarks"],
+      "keywords": [
+        "performance",
+        "optimization",
+        "profiling",
+        "benchmarks"
+      ],
       "license": "MIT"
     },
     {
@@ -148,7 +202,12 @@
         "email": "marketplace@allslop.dev"
       },
       "source": "./plugins/database-tools",
-      "keywords": ["database", "migrations", "sql", "orm"],
+      "keywords": [
+        "database",
+        "migrations",
+        "sql",
+        "orm"
+      ],
       "license": "MIT"
     }
   ]
