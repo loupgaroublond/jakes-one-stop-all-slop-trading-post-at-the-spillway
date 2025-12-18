@@ -141,6 +141,43 @@ Your job is to:
 
    **This is critical** - write findings to storage before returning so they persist even if the orchestrator fails.
 
+8. **Write metadata.json (MANDATORY)**:
+   After writing findings, immediately write metadata to track analysis progress:
+   ```bash
+   cat > "{storage_path}/sessions/{session_id}/metadata.json" <<'EOF'
+   {
+     "session_id": "{session_id}",
+     "session_serial": "{session_serial}",
+     "analyzed_through_message": {end_offset},
+     "total_messages_at_analysis": {total_messages},
+     "analysis_timestamp": "{ISO-8601 timestamp}",
+     "analysis_version": "v2.0"
+   }
+   EOF
+   ```
+
+   **Sample metadata.json:**
+   ```json
+   {
+     "session_id": "abc123-def456-...",
+     "session_serial": "S42",
+     "analyzed_through_message": 150,
+     "total_messages_at_analysis": 150,
+     "analysis_timestamp": "2025-12-17T10:30:00Z",
+     "analysis_version": "v2.0"
+   }
+   ```
+
+9. **Verify atomic completion**:
+   Before reporting success, verify BOTH files exist:
+   ```bash
+   test -f "{storage_path}/sessions/{session_id}/findings-*.json" && \
+   test -f "{storage_path}/sessions/{session_id}/metadata.json" || \
+   echo "ERROR: Missing artifacts - analysis incomplete"
+   ```
+
+   **Critical**: Do NOT return "complete" status unless both files are verified to exist.
+
 ## Output
 
 Return a JSON object:
@@ -330,7 +367,8 @@ Before returning your analysis, verify:
 - [ ] **Session serial used**: S number from input appears in all findings
 - [ ] **Finding serials assigned**: Every finding has T1, T2, T3... IDs
 - [ ] **Findings written to storage**: JSON file saved to `{storage_path}/sessions/{session_id}/`
-- [ ] **Metadata updated**: `analyzed_through_message` reflects current progress
+- [ ] **Metadata written and verified**: metadata.json written with all required fields (session_id, session_serial, analyzed_through_message, total_messages_at_analysis, analysis_timestamp, analysis_version)
+- [ ] **Atomic verification passed**: Both findings-*.json AND metadata.json exist before returning
 - [ ] **Evidence ranges included**: Every finding has `[M#start-end]` references
 - [ ] **Drill-down keywords included**: Every finding has specific search terms
 - [ ] **Domain assigned**: Every finding categorized by domain
