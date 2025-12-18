@@ -72,30 +72,51 @@ mkdir -p ~/.claude/analysis-<name>/inventory
 
 This ensures each analysis run starts clean and reports don't accumulate across runs.
 
-### 3. Discover Unseen Sessions
+### 3. Discover Unseen Sessions (with deduplication)
 
-Find all session files for this project (both regular sessions and agent logs):
-```bash
-ls ~/.claude/projects/{project-path}/*.jsonl          # includes agent-*.jsonl
-ls ~/.claude/session-archives/{project-path}/*.jsonl 2>/dev/null
-```
+Sessions can exist in multiple locations (active, archived, peer copies). Deduplicate by session ID (UUID) with precedence order ensuring most current version is used.
 
-**Discover peer sessions** (if configured):
-1. Check for `.claude/project-peers.json` in the current project directory
-2. For each configured peer (machine → remote-path):
+**Discovery order (lowest to highest precedence):**
+
+1. **Peer sessions** (if configured):
+   Check for `.claude/project-peers.json` in the current project directory.
+   For each configured peer (machine → remote-path):
    ```bash
-   ls ~/.claude/session-archives/other-machines/{machine}/{remote-path}/*.jsonl
+   # Lowest precedence - remote copies may be stale
+   for file in ~/.claude/session-archives/other-machines/{machine}/{remote-path}/**/*.jsonl(N); do
+     session_id=$(basename "$file" .jsonl)
+     sessions["$session_id"]="$file"
+   done
    ```
-3. Include peer sessions in the work queue, tagged with their source machine
 
-For each session, check if analyzed:
+2. **Archived sessions**:
+   ```bash
+   # Medium precedence - archived copies
+   for file in ~/.claude/session-archives/{project-path}/**/*.jsonl(N); do
+     session_id=$(basename "$file" .jsonl)
+     sessions["$session_id"]="$file"
+   done
+   ```
+
+3. **Active project sessions**:
+   ```bash
+   # Highest precedence - current active sessions (overwrites archived)
+   for file in ~/.claude/projects/{project-path}/**/*.jsonl(N); do
+     session_id=$(basename "$file" .jsonl)
+     sessions["$session_id"]="$file"
+   done
+   ```
+
+**Result:** `sessions` array contains exactly one path per unique session ID, preferring most current copy.
+
+**Identify agent logs**: Files matching `agent-*.jsonl` are subagent sessions. They are analyzed alongside regular sessions but serialize differently (see below).
+
+For each unique session, check if analyzed:
 - Read metadata from `~/.claude/analysis/sessions/{session-id}/metadata.json`
 - If `analyzed_through_message < total_messages`, session has unseen content
 - If no metadata exists, session is entirely unseen
 
-**Identify agent logs**: Files matching `agent-*.jsonl` are subagent sessions. They are analyzed alongside regular sessions but serialize differently (see below).
-
-Build work queue of sessions to analyze (local + peer sessions).
+Build work queue of sessions to analyze.
 
 ### 4. Assign Serial Numbers (BEFORE dispatching subagents)
 
