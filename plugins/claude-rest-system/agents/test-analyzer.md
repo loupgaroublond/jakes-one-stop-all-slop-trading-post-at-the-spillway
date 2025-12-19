@@ -37,8 +37,8 @@ ls ~/.claude/session-archives/*/$SESSION_ID.jsonl 2>/dev/null
 
 **If given project name:**
 ```bash
-# List sessions for that project
-ls ~/.claude/projects/-Users-yankee-*$PROJECT*/*.jsonl 2>/dev/null | head -20
+# List sessions for that project (glob pattern works for any user)
+ls ~/.claude/projects/*$PROJECT*/*.jsonl 2>/dev/null | head -20
 ```
 
 ### 2. Check Session Sizes

@@ -79,15 +79,30 @@ Sessions can exist in multiple locations (active, archived, peer copies). Dedupl
 **Discovery order (lowest to highest precedence):**
 
 1. **Peer sessions** (if configured):
-   Check for `.claude/project-peers.json` in the current project directory.
-   For each configured peer (machine → remote-path):
+   Check for `.claude/project-peers.json` in the current project directory:
    ```bash
+   cat .claude/project-peers.json 2>/dev/null
+   ```
+
+   If the file exists, it maps machine names to arrays of remote project paths:
+   ```json
+   {
+     "work": ["-Users-ynemoy-Documents-grug-brained-employee"],
+     "home": ["-Users-john-Projects-myproject"]
+   }
+   ```
+
+   For each machine and each remote-path in that machine's array, scan for sessions:
+   ```bash
+   # Example for machine "work" with remote-path "-Users-ynemoy-Documents-grug-brained-employee"
    # Lowest precedence - remote copies may be stale
-   for file in ~/.claude/session-archives/other-machines/{machine}/{remote-path}/**/*.jsonl(N); do
+   for file in ~/.claude/session-archives/other-machines/work/-Users-ynemoy-Documents-grug-brained-employee/**/*.jsonl(N); do
      session_id=$(basename "$file" .jsonl)
      sessions["$session_id"]="$file"
    done
    ```
+
+   **IMPORTANT:** You MUST read project-peers.json and iterate over ALL machines and ALL paths. Do not skip this step.
 
 2. **Archived sessions**:
    ```bash

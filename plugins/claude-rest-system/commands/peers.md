@@ -10,7 +10,7 @@ Help the user discover and configure peer projects from other machines for cross
 
 ### 1. Identify Current Project
 
-Determine the current project path (the Claude project path format, e.g., `-Users-yankee-...-project-name`).
+Determine the current project path (the Claude project path format, e.g., `-Users-{username}-...-project-name`).
 
 ### 2. Scan Other Machines
 
@@ -35,13 +35,14 @@ Present findings to the user:
 ## Projects on other machines
 
 ### work (strong matches)
-- `-Users-workuser-projects-grug-brained-employee` ← likely same as current project
+- `-Users-workuser-projects-totally-not-skynet` ← likely same as current project
 
 ### work (other projects)
-- `-Users-workuser-projects-other-thing`
-- `-Users-workuser-documents-notes`
+- `-Users-workuser-projects-shitty-day-job-at-the-spillway`
+- `-Users-workuser-projects-side-hustle`
+- `-Users-workuser-documents-secret-plans`
 
-Current project: `-Users-yankee-...-grug-brained-employee`
+Current project: `-Users-{username}-...-totally-not-skynet`
 ```
 
 ### 4. Configure Peers
@@ -50,7 +51,7 @@ Ask the user which projects to add as peers. When they confirm, update `.claude/
 
 ```json
 {
-  "work": "-Users-workuser-projects-grug-brained-employee"
+  "work": "-Users-workuser-projects-totally-not-skynet"
 }
 ```
 

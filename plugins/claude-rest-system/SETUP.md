@@ -15,8 +15,8 @@ Installation and configuration guide for the Claude Rest System plugin.
 
 The plugin automatically registers:
 - SessionStart hook (silently archives sessions)
-- Slash commands: `/yawn`, `/rest`, `/drilldown`, `/peers`
-- Subagents: `rest-analyzer`, `recommendations-assembler`, `test-analyzer`
+- Slash commands: `/yawn`, `/rest`, `/drilldown`, `/rewind`, `/peers`
+- Subagents: `rest-analyzer`, `recommendations-assembler`, `rewind-agent`, `test-analyzer`
 - Skills: `session-analysis`
 
 
@@ -87,4 +87,5 @@ You should see a fatigue report showing unseen sessions by project.
 | `/yawn` | Check fatigue level - how many sessions need review |
 | `/rest` | Analyze unseen sessions and produce rest report |
 | `/drilldown` | Drill into specific findings for detailed evidence |
+| `/rewind` | Search current session for events lost to context compaction |
 | `/peers` | Discover and configure peer projects from other machines |

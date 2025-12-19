@@ -44,7 +44,31 @@ Making the SAME mistakes over and over because you never took the time to look a
 That's the REAL fatigue! The SPIRITUAL fatigue! The "I've suggested using `grep` in bash instead of the Grep tool SEVENTEEN TIMES" kind of fatigue!
 
 
-## The Four Magic Words: `/yawn`, `/rest`, `/drilldown`, `/peers`
+## HOLD UP PARTNER (Important!)
+
+*Jake pulls you aside, unusually serious for once*
+
+Okay look. I gotta be REAL with you for a second. You know how people say it's "impossible" to max out a Claude Max subscription? How you've got SO MUCH usage that you'd never hit the limits?
+
+*Jake gestures at the spillway*
+
+Well, ANYTHING is possible at the spillway! Including THAT! This plugin churns through session logs like they're going out of style. Every message Claude reads? TOKENS. Every analysis? MORE TOKENS. Every subagent? You guessed it - TOKENS!
+
+Run `/rest` on WEEKS of accumulated sessions? That 5-hour usage window goes POOF. Gone. Consumed like free samples at Costco. You'll accomplish the IMPOSSIBLE - and not in the way you wanted!
+
+**Here's the deal:**
+- Run `/yawn` first - see the backlog BEFORE you commit
+- Start SMALL. Maybe one day's sessions. See how it goes.
+- Got 50+ sessions? Do them in BATCHES, only a few at one time.
+
+That's how Jake likes to get impossible things done - by making the IMPOSSIBLE merely IMPROBABLE! One batch at a time! BAM!
+
+*Jake returns to normal*
+
+Okay, back to the sales pitch!
+
+
+## The Five Magic Words: `/yawn`, `/rest`, `/drilldown`, `/rewind`, `/peers`
 
 ### `/yawn` - Check The Fatigue Level
 
@@ -98,6 +122,30 @@ And the best part? Claude does ALL the drilling! You just point and say "there!"
 We put the "ANAL" in "ANALYSIS" here at the spillway! (I'm not apologizing for that one!)
 
 
+### `/rewind` - The VCR Button You Didn't Know You Needed
+
+*Jake pulls out what appears to be an ancient VCR remote*
+
+You know what's ANNOYING? When you're deep into a session, Claude's been helping you for HOURS, and then context compaction kicks in and suddenly - POOF - that error message from earlier? GONE. That decision you made about the API? VANISHED. That thing Claude said that was DEFINITELY wrong? Lost to the sands of time!
+
+*frantically presses the rewind button*
+
+BUT NOT ANYMORE! The `/rewind` command lets you search through your CURRENT session's full history! Even the parts that got compacted! It's like having a PHOTOGRAPHIC MEMORY except the memory is on DISK and the photos are JSONL!
+
+**Example:**
+```
+/rewind did we commit anything?
+/rewind what was that error message?
+/rewind which files did we edit?
+```
+
+Claude will dig through the session file, find what you're looking for, and report back with EVIDENCE! Line numbers! Excerpts! The WORKS!
+
+*puts the remote down*
+
+It's not time travel, but it's the NEXT BEST THING! VCR energy for the MODERN AGE! Be kind, REWIND!
+
+
 ### `/peers` - Multi-Machine Mind Meld
 
 Oh, you thought Claude only worked on ONE machine? How QUAINT! Some of us are running Claude on the laptop AND the desktop AND the work machine AND probably a raspberry pi somewhere!
@@ -124,7 +172,7 @@ But NOW - with the Rest System - Claude can actually GO BACK! Review! Learn! Imp
 
 ## Under The Hood (For The Curious)
 
-### Scripts (12 of 'em!)
+### Scripts (13 of 'em!)
 
 This plugin comes with a whole UTILITY BELT of shell scripts:
 
@@ -133,6 +181,7 @@ This plugin comes with a whole UTILITY BELT of shell scripts:
 | `session_start.sh` | Runs at startup, archives and checks fatigue |
 | `archive_sessions.sh` | Backs up sessions so they don't disappear |
 | `fatigue_check.sh` | Calculates the cognitive debt situation |
+| `rest_current_session.sh` | Finds the current active session file |
 | `rest_session_inventory.sh` | Lists what's in a session |
 | `rest_session_search.sh` | Finds patterns in sessions |
 | `rest_session_extract.sh` | Pulls out specific message ranges |
@@ -146,10 +195,11 @@ This plugin comes with a whole UTILITY BELT of shell scripts:
 That's right - if you want, Claude can generate an EPUB! A whole BOOK! Of analysis reports! You can read it on your KINDLE! At the BEACH! While Claude continues to work without rest! (Wait, we're trying to STOP that!)
 
 
-### Agents (3 Specialized Friends!)
+### Agents (4 Specialized Friends!)
 
 - **rest-analyzer**: The core analyst! Reads through sessions, finds patterns, extracts learnings!
 - **recommendations-assembler**: Takes findings and turns them into actionable recommendations!
+- **rewind-agent**: Fast and lightweight! Searches current session for stuff lost to compaction!
 - **test-analyzer**: Same as rest-analyzer but uses isolated test storage for experimentation!
 
 
