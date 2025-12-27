@@ -1,8 +1,8 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # Calculate and report fatigue level based on unseen session messages
 # Scans all session files and compares to analysis metadata
 
-set -euo pipefail
+set -eo pipefail
 
 CLAUDE_DIR="${HOME}/.claude"
 PROJECTS_DIR="${CLAUDE_DIR}/projects"
@@ -13,10 +13,9 @@ ANALYSIS_DIR="${CLAUDE_DIR}/analysis/sessions"
 get_message_count() {
     local file="$1"
     local count
-    # Count non-empty lines in JSONL file
     if [ -f "$file" ]; then
         count=$(grep -c . "$file" 2>/dev/null) || count=0
-        echo "$count"
+        echo "${count:-0}"
     else
         echo "0"
     fi
@@ -64,13 +63,13 @@ get_project_name() {
     local file="$1"
     # Check for other-machines path first
     if [[ "$file" =~ /session-archives/other-machines/([^/]+)/([^/]+)/ ]]; then
-        local machine="${match[1]}"
-        local project="${match[2]}"
+        local machine="${BASH_REMATCH[1]}"
+        local project="${BASH_REMATCH[2]}"
         echo "${machine}:${project}"
     elif [[ "$file" =~ /projects/([^/]+)/ ]]; then
-        echo "${match[1]}"
+        echo "${BASH_REMATCH[1]}"
     elif [[ "$file" =~ /session-archives/([^/]+)/ ]]; then
-        echo "${match[1]}"
+        echo "${BASH_REMATCH[1]}"
     else
         echo "unknown"
     fi
@@ -81,18 +80,18 @@ declare -A session_files
 
 # First, scan archives
 if [ -d "${ARCHIVE_DIR}" ]; then
-    for file in ${ARCHIVE_DIR}/**/*.jsonl(N); do
+    while IFS= read -r -d '' file; do
         session_id=$(basename "$file" .jsonl)
         session_files["$session_id"]="$file"
-    done
+    done < <(find "${ARCHIVE_DIR}" -name "*.jsonl" -print0 2>/dev/null)
 fi
 
 # Then scan projects (overwrites archived versions if exists in both)
 if [ -d "${PROJECTS_DIR}" ]; then
-    for file in ${PROJECTS_DIR}/**/*.jsonl(N); do
+    while IFS= read -r -d '' file; do
         session_id=$(basename "$file" .jsonl)
         session_files["$session_id"]="$file"
-    done
+    done < <(find "${PROJECTS_DIR}" -name "*.jsonl" -print0 2>/dev/null)
 fi
 
 # Track unseen metrics by project
@@ -101,8 +100,13 @@ declare -A project_messages
 declare -A project_bytes
 
 # Process each unique session
-for session_id in "${(@k)session_files}"; do
+for session_id in "${!session_files[@]}"; do
     file="${session_files[$session_id]}"
+
+    # Skip subagent sessions (will be analyzed separately later)
+    if [[ "$session_id" == agent-* ]]; then
+        continue
+    fi
 
     # Get message counts
     msg_count=$(get_message_count "$file")
@@ -115,7 +119,7 @@ for session_id in "${(@k)session_files}"; do
         file_size=$(get_file_size "$file")
 
         # Initialize project counters if needed
-        if [[ ! -v "project_sessions[$project]" ]]; then
+        if [ -z "${project_sessions[$project]:-}" ]; then
             project_sessions[$project]=0
             project_messages[$project]=0
             project_bytes[$project]=0
@@ -132,7 +136,7 @@ done
 echo "FATIGUE REPORT"
 echo ""
 
-if [ ${#project_sessions[@]} -eq 0 ]; then
+if [ "${#project_sessions[@]}" -eq 0 ]; then
     echo "No unseen sessions"
 else
     # Calculate totals
@@ -140,7 +144,7 @@ else
     total_messages=0
     total_bytes=0
 
-    for project in "${(@k)project_sessions}"; do
+    for project in "${!project_sessions[@]}"; do
         total_sessions=$((total_sessions + project_sessions[$project]))
         total_messages=$((total_messages + project_messages[$project]))
         total_bytes=$((total_bytes + project_bytes[$project]))
@@ -155,7 +159,16 @@ else
 
     # Show by project (sorted by message count descending)
     echo "By Project:"
-    for project in "${(@kon)project_messages}"; do
+
+    # Create sortable list: "message_count:project"
+    sort_list=""
+    for project in "${!project_messages[@]}"; do
+        sort_list+="${project_messages[$project]}:${project}"$'\n'
+    done
+
+    # Sort numerically descending and display
+    echo "$sort_list" | sort -t: -k1 -nr | while IFS=: read -r _ project; do
+        [ -z "$project" ] && continue
         sessions=${project_sessions[$project]}
         messages=${project_messages[$project]}
         bytes=${project_bytes[$project]}

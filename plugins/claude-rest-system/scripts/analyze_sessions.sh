@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/bin/bash
 # Analyze session files and update metadata (STUB VERSION)
 # This is a placeholder - actual analysis logic will be implemented in v2.0
 
@@ -113,7 +113,7 @@ fi
 analyzed_count=0
 skipped_count=0
 
-for session_id in "${(@k)session_files}"; do
+for session_id in "${!session_files[@]}"; do
     file="${session_files[$session_id]}"
 
     # Skip if specific session requested and this isn't it
