@@ -485,6 +485,42 @@ Users need to uninstall/reinstall to get updates. If the version doesn't change,
 
 ---
 
+## SLOP REPORT (The Changelog)
+
+Jake keeps a record of ALL his deals at `SLOP_REPORT.md` in the repo root. That's Jake's **S**pillway **L**edger **O**f **P**atches - a marketplace-wide changelog covering ALL plugins!
+
+### Format
+
+Each dated entry gets:
+- A Jake-style title in quotes (the vibe of that update)
+- Plugin version bumps listed underneath
+- Actual changes in bullet form
+
+**Example:**
+```markdown
+## 2025-12-27 — "THE BEEFY UPDATE"
+
+### claude-rest-system v2.0.0
+- Session classification system (Group A/B)
+- BEEFY pipeline for large sessions
+- 7 specialized agents
+```
+
+### When to Update
+
+**Every version bump needs a SLOP REPORT entry:**
+1. Add dated entry (or append to existing date)
+2. List plugin name and version
+3. Bullet the actual changes
+4. Jake voice for titles, clarity for content
+
+### Why A Marketplace-Wide Changelog?
+
+Because Jake slops EVERYTHING together! The spillway doesn't have separate aisles - it's all one big, beautiful mess of plugins and deals! One changelog for the whole trading post!
+
+
+---
+
 *Now get out there and write some SLOP!*
 
 *It's QUALITY slop! (It's not quality slop!)*

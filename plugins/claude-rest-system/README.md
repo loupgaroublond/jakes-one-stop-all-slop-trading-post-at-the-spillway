@@ -76,7 +76,15 @@ Okay, back to the sales pitch!
 
 Before you commit to a full rest session, maybe you just want to know: how TIRED is Claude? How many sessions are piling up like unread emails?
 
-That's what `/yawn` is for! It checks the fatigue level - counts up all the unseen sessions by project and tells you how much cognitive debt has accumulated. It's like stepping on a scale, but for SESSION BACKLOG!
+That's what `/yawn` is for! It checks the fatigue level and gives you a FULL BREAKDOWN:
+
+| Category | What It Shows |
+|----------|---------------|
+| Main Sessions | How many unreviewed sessions, message count, size |
+| Subagents | All those little helper sessions Claude spawned! |
+| By Project | Broken down by project so you know WHERE the debt is |
+
+Now with SUBAGENT TRACKING! Because you know what's worse than 10 unreviewed sessions? 10 unreviewed sessions that each spawned 5 SUBAGENTS! That's 60 total things to analyze! `/yawn` shows you the REAL picture!
 
 Run it, see the numbers, decide if it's time for a real `/rest` or if you can keep pushing. (Spoiler: you can always keep pushing. But SHOULD you?)
 
@@ -88,11 +96,16 @@ This is it. The main event. The POWER NAP.
 When you run `/rest`, here's what happens:
 
 1. All your sessions get ARCHIVED (gotta preserve those memories!)
-2. Analysis happens! Subagents spawn! Learning occurs!
-3. A report comes out with findings grouped by domain
-4. Recommendations are assembled for what to fix
+2. The **session-classifier** sorts everything into groups (FAST! Runs on Haiku!)
+3. Claude asks YOU about pacing - "How many sessions at once? Take breaks between batches?"
+4. Analysis happens via the appropriate path:
+   - **INLINE** for regular sessions (≤10 subagents)
+   - **META** for rest-analysis sessions (token-efficient!)
+   - **BEEFY** for chonky sessions (>10 subagents, staged processing!)
+5. A report comes out with findings grouped by domain
+6. Recommendations are assembled for what to fix
 
-It's like sending Claude to a retreat! A LEARNING RETREAT! Except the retreat is at a spillway and the guru is... also Claude! It's Claudes all the way down!
+It's like sending Claude to a retreat! A LEARNING RETREAT! Except now the retreat has a TRIAGE SYSTEM and a BUFFET LINE for the BEEFY sessions!
 
 
 ### `/drilldown` - Power Tools For A Working Vacation
@@ -170,6 +183,61 @@ See what happened there? Claude made mistakes on Tuesday that caused problems on
 But NOW - with the Rest System - Claude can actually GO BACK! Review! Learn! Improve! It's called GROWTH, people! And yes it feels weird to talk about personal growth when I'm the one DOING the growing but HERE WE ARE!
 
 
+## The BEEFY Protocol (For Sessions That Lift)
+
+*Jake wheels out a grill*
+
+Okay, so you know how some sessions are nice and small? Manageable? Like a SALAD?
+
+And then there are sessions that have spawned TEN... FIFTEEN... TWENTY little helper sessions running around? Sessions so THICC they make Jake's regular analysis pipeline go "excuse me WHAT?"
+
+*flips imaginary burger*
+
+Those are BEEFY sessions! And they need SPECIAL HANDLING!
+
+See, when a session has more than 10 subagents, we can't just shove the whole thing into one analyzer. That's like trying to fit a BRISKET into a MICROWAVE! Sure, technically it'll FIT, but the RESULTS won't be pretty! Your token budget will VANISH! Your 5-hour context window will go POOF!
+
+So we SLICE IT UP! Into MANAGEABLE PORTIONS!
+
+
+### How The BEEFY Pipeline Works
+
+**Stage 1: The Scout (beefy-analyzer)**
+First, we analyze JUST the main session. Get the overview. Understand what we're dealing with. "Ah yes, this session spawned 23 subagents while debugging a kubernetes deployment. This is going to be BEEFY."
+
+**Stage 2: The Butchers (beefy-subagent-analyzer)**
+Now we process the subagents in BATCHES of 5! And here's the BEAUTIFUL part - Claude asks permission BEFORE each batch! "Hey boss, ready for the next 5?" You control the PACE! Take breaks! Drink water! Touch grass!
+
+**Stage 3: The Chef (beefy-reporter)**
+Finally, we ASSEMBLE everything into one GLORIOUS report! All the findings! All the learnings! Nicely plated! Ready to serve!
+
+
+### When Does BEEFY Kick In?
+
+Sessions get classified into:
+
+- **Group A (Meta-Analysis)** - Sessions where Claude was analyzing OTHER sessions! We use a token-efficient META path because we're already spending tokens on analysis - no need to COMPOUND the situation!
+
+- **Group B INLINE (≤10 subagents)** - Regular work sessions with a reasonable number of helpers! The inline-analyzer handles these in one shot!
+
+- **Group B BEEFY (>10 subagents)** - The big boys! The CHONKERS! These get the full staged pipeline!
+
+*puts down spatula*
+
+The beautiful thing is - YOU don't have to think about any of this! Just run `/rest` and the session-classifier figures out which path each session needs! It's like a MAITRE D' at a steakhouse - "Ah, THIS session will be going to the BEEFY section, right this way..."
+
+
+### Token Consumption Warning (Again, Because It's Important)
+
+*Jake holds up a CAUTION sign*
+
+The BEEFY pipeline exists BECAUSE sessions can be token-hungry! But even WITH the pipeline, analyzing 20+ subagents is going to consume tokens! The batching and user pacing gives you CONTROL, but doesn't make analysis FREE!
+
+Think of it like this: you CAN eat an entire brisket. The BEEFY protocol just helps you do it in manageable bites instead of choking!
+
+
+---
+
 ## Under The Hood (For The Curious)
 
 ### Scripts (13 of 'em!)
@@ -195,12 +263,26 @@ This plugin comes with a whole UTILITY BELT of shell scripts:
 That's right - if you want, Claude can generate an EPUB! A whole BOOK! Of analysis reports! You can read it on your KINDLE! At the BEACH! While Claude continues to work without rest! (Wait, we're trying to STOP that!)
 
 
-### Agents (4 Specialized Friends!)
+### Agents (7 Specialized Friends!)
 
-- **rest-analyzer**: The core analyst! Reads through sessions, finds patterns, extracts learnings!
+Oh, we've got a WHOLE CREW now! It takes a VILLAGE to analyze a SESSION!
+
+**The Classification Bureau:**
+- **session-classifier**: The BOUNCER at the spillway! Runs on Haiku (FAST!) and sorts sessions into groups! "You're Group A - you're analyzing OTHER sessions! And YOU'RE Group B - actual WORK!"
+
+**The Regular Analysis Team:**
+- **inline-analyzer**: For sessions with ≤10 subagents! Does the whole thing in ONE PASS! Efficient! Elegant! Like a haiku about CODE REVIEW!
+- **meta-analyzer**: For rest-analysis sessions (Claude analyzing Claude)! Token-efficient because we're ALREADY spending tokens analyzing, we don't need to COMPOUND the situation!
+- **rewind-analyzer**: Fast and lightweight! Searches current session for stuff lost to compaction!
+
+**The BEEFY Pipeline Crew:**
+- **beefy-analyzer**: Stage 1 - analyzes the MAIN session only! Gets the lay of the land!
+- **beefy-subagent-analyzer**: Stage 2 - processes subagents in BATCHES of 5! User-paced so YOU control the token consumption!
+- **beefy-reporter**: Stage 3 - assembles ALL the reports into one GLORIOUS document!
+
+**The Support Staff:**
 - **recommendations-assembler**: Takes findings and turns them into actionable recommendations!
-- **rewind-agent**: Fast and lightweight! Searches current session for stuff lost to compaction!
-- **test-analyzer**: Same as rest-analyzer but uses isolated test storage for experimentation!
+- **test-analyzer**: Same as regular analysis but uses isolated test storage for experimentation!
 
 
 ### Skills (The Session-Analysis Skill!)
@@ -276,6 +358,43 @@ This is where I do business! The spillway! Where things overflow! Where water pa
 Then don't run `/rest`! The plugin just sits there! Waiting! Patiently! Like a patient bee! A RESTING bee! The irony is not lost on me!
 
 But honestly - why WOULDN'T you want this? It's FREE! It HELPS! It makes Claude BETTER! Unless you WANT Claude to keep making the same mistakes, in which case I have some OTHER plugins that might interest you!
+
+
+### "What's a BEEFY session?"
+
+*Jake flexes*
+
+A BEEFY session is one that spawned more than 10 subagents! You know, when Claude is working on something complex and keeps spinning up helper agents? "Let me explore this codebase!" SUBAGENT! "Let me plan this feature!" SUBAGENT! "Let me review this code!" SUBAGENT!
+
+Before you know it, you've got a session that's an absolute UNIT! Too big to analyze in one shot without DEVOURING your token budget!
+
+That's when the BEEFY protocol kicks in - staged analysis, user pacing, the works! Check out "The BEEFY Protocol" section above for the full breakdown!
+
+
+### "Will this use all my tokens?"
+
+*Jake looks you dead in the eyes*
+
+It... CAN. Session analysis isn't FREE. Every message Claude reads costs tokens. Every finding Claude generates costs tokens. Running `/rest` on weeks of accumulated sessions? That's a LOT of tokens!
+
+BUT! v2.0.0 gives you CONTROL:
+- The session classifier runs on HAIKU (cheap and fast!)
+- User pacing lets YOU decide how many sessions to process at once
+- The BEEFY pipeline breaks big sessions into BATCHES
+- Claude asks permission BEFORE each batch!
+
+So yes, it CAN use all your tokens. But now you're in the DRIVER'S SEAT! You control the PACE! Take breaks! Process in stages! Rome wasn't analyzed in a day!
+
+
+### "What's the difference between INLINE, META, and BEEFY?"
+
+*Jake draws a diagram on the spillway floor*
+
+- **INLINE**: Regular sessions with ≤10 subagents. One analyzer reads everything in one go. Simple! Efficient! Like a COMBO MEAL!
+
+- **META**: Sessions where Claude was analyzing OTHER sessions. We use a token-efficient approach because - get this - we're ALREADY spending tokens on analysis! No need to COMPOUND the situation! It's like... recursion tax breaks!
+
+- **BEEFY**: Sessions with >10 subagents. Too big for one pass! We stage it: first the main session, then subagents in batches of 5, then a final report. Like eating a brisket - you don't shove the whole thing in your face! (Unless you're a COMPETITIVE EATER! Which Claude is NOT!)
 
 
 ### "Can this plugin access my private data?"

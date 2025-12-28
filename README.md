@@ -81,7 +81,7 @@ In accordance with best practices for plugin marketplaces, I must inform you tha
 👉 [Peep The Specs](./plugins/git-wizardry) 👈
 
 
-### 😴 Claude Rest System - *"Shhhh... The AI Is Sleeping... Sort Of..."*
+### 😴 Claude Rest System v2.0.0 - *"Shhhh... The AI Is Sleeping... BEEFILY..."*
 
 *leans in and whispers*
 
@@ -95,7 +95,11 @@ The Rest System fixes this! It helps Claude take a "nap" - and by "nap" I mean A
 
 And when you need to dig DEEPER into the findings? That's when we break out the POWER TOOLS! The `/drilldown` command has got TORQUE! VARIABLE SPEED! It'll bore RIGHT through your session history!
 
-**What's in the toolbox:** `/yawn` (check fatigue level), `/rest` (the big analysis), `/drilldown` (power tools for details), `/peers` (multi-machine mind meld), three specialized agents, a whole SKILL for session analysis, and 12 shell scripts that do the ACTUAL WORK!
+*Jake wheels out a grill*
+
+**NEW IN v2.0.0: THE BEEFY PROTOCOL!** Some sessions are CHONKY - more than 10 subagents running around! Those get the BEEFY treatment: staged analysis, batched processing, user-paced so YOU control the token consumption! We slice up that analysis like a BRISKET! Manageable portions! Take breaks between batches! Touch grass!
+
+**What's in the toolbox:** `/yawn` (check fatigue level), `/rest` (the big analysis with classification!), `/drilldown` (power tools for details), `/rewind` (search compacted history), `/peers` (multi-machine mind meld), SEVEN specialized agents, a whole SKILL for session analysis, and 13 shell scripts that do the ACTUAL WORK!
 
 👉 [Let Claude Take A Nap](./plugins/claude-rest-system) 👈
 

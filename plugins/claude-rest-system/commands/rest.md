@@ -9,15 +9,26 @@ You are running the Rest System - a session analysis workflow that reviews prior
 ## Workflow Overview
 
 ```
-Sessions → Session Analyzers → Session Reports (narrative markdown)
-                                      ↓
-                              Pattern Identification
-                                      ↓
-                Pattern Consolidators (parallel) → Pattern Reports
-                                      ↓
-                         Recommendations Assembler
-                                      ↓
-                              Final Report + EPUB
+1. Fatigue Check (writes inventory JSON)
+   └─ ~/.claude/analysis/fatigue_inventory.json
+
+2. Session Classifier (haiku, fast)
+   └─ Group A (rest-analysis) → META path
+   └─ Group B (regular work) → INLINE or BEEFY path
+
+3. User Pace Confirmation
+   └─ Concurrent analyzers, beefy batch pace
+
+4. Analyze Sessions in Parallel:
+   ├─ Group A → meta-analyzer (token-efficient)
+   ├─ Group B inline (≤10 subagents) → inline-analyzer
+   └─ Group B beefy (>10 subagents):
+       ├─ beefy-analyzer (main session)
+       ├─ beefy-subagent-analyzer × N (batches of 5)
+       └─ beefy-reporter (assemble)
+
+5. Pattern Identification → Pattern Consolidators
+6. Recommendations Assembler → Final Report + EPUB
 ```
 
 ## Workflow
@@ -29,7 +40,22 @@ First, run the session start script to archive sessions and check fatigue:
 ~/.claude/self/session_start.sh
 ```
 
-This shows the current fatigue level (unseen sessions/messages by project).
+This shows the current fatigue level (unseen sessions/messages by project) and writes the session inventory to:
+- `~/.claude/analysis/fatigue_inventory.json`
+
+The inventory includes main sessions with their subagents:
+```json
+[
+  {
+    "file": "/path/to/session.jsonl",
+    "project": "project-name",
+    "unseen_messages": 42,
+    "subagents": [
+      {"file": "/path/to/agent-abc.jsonl", "messages": 10, "unseen_messages": 10}
+    ]
+  }
+]
+```
 
 ### 2. Identify Current Project
 
@@ -133,6 +159,64 @@ For each unique session, check if analyzed:
 
 Build work queue of sessions to analyze.
 
+### 3.5. Classify Sessions
+
+Read the inventory from `~/.claude/analysis/fatigue_inventory.json` and spawn `session-classifier` agent (runs on haiku for speed):
+
+**Input:** The session inventory JSON
+**Output:** Classified session list with group + path assignments
+
+```json
+{
+  "classified": [
+    {"file": "...", "group": "A", "path": "META"},
+    {"file": "...", "group": "B", "path": "INLINE", "subagent_count": 5},
+    {"file": "...", "group": "B", "path": "BEEFY", "subagent_count": 25}
+  ],
+  "summary": {
+    "group_a_count": 1,
+    "group_b_inline_count": 3,
+    "group_b_beefy_count": 1
+  }
+}
+```
+
+**Classification criteria:**
+- **Group A** (rest-analysis sessions): Sessions analyzing other sessions (rest-analyzer, meta-analyzer, session-analysis)
+- **Group B** (regular work): Everything else
+  - **INLINE**: ≤10 subagents (analyze main + subagents together)
+  - **BEEFY**: >10 subagents (staged analysis with user pacing)
+
+**Parallel streams:** If >20 unseen sessions, classifier breaks them into parallel streams for efficient processing.
+
+### 3.6. User Pace Confirmation
+
+Before dispatching analyzers, confirm pace settings with the user:
+
+```
+=== Analysis Pace Settings ===
+
+Sessions to analyze: {count}
+  - Group A (meta): {count}
+  - Group B inline: {count}
+  - Group B beefy: {count}
+
+Recommended defaults:
+  - Concurrent analyzers: 3
+  - Beefy batch size: 5 subagents
+  - Confirm between batches: No
+
+Proceed with defaults? Or specify:
+  - Different concurrency (1-5)
+  - Different batch size (3-10)
+  - Pause between beefy batches
+```
+
+**Always get confirmation before proceeding.** User may adjust based on:
+- Available context window (5-hour token budget)
+- Desire for more/less parallelism
+- Need to review between batches
+
 ### 4. Assign Serial Numbers (BEFORE dispatching subagents)
 
 The orchestrator assigns ALL serial numbers before analysis begins:
@@ -151,16 +235,50 @@ The orchestrator assigns ALL serial numbers before analysis begins:
 5. Write metadata: `is_agent: true`, `parent_session_id`, `agent_number`
 6. Reference format: S32 A2 (agent 2 of session 32)
 
-**Pass to subagents:** Include `session_serial: "S3"` or `session_serial: "S3 A2"` when spawning rest-analyzer
+**Pass to subagents:** Include `session_serial: "S3"` or `session_serial: "S3 A2"` when spawning analyzers (meta-analyzer, inline-analyzer, or beefy-*)
 
-### 5. Analyze Sessions (NARRATIVE OUTPUT)
+### 5. Analyze Sessions (DISPATCHING BY GROUP)
 
-For each unseen session, spawn rest-analyzer subagent with:
-- `session_file`: Path to JSONL
-- `storage_path`: Analysis storage location (e.g., `~/.claude/analysis-preprod/`)
-- `session_serial`: The S number (e.g., "S3")
+Dispatch sessions to appropriate analyzers based on classification (all run in parallel at user-confirmed pace):
 
-**CRITICAL: Subagents produce NARRATIVE MARKDOWN REPORTS, not JSON.**
+**Group A (rest-analysis sessions) → meta-analyzer:**
+```
+Input:
+- session_file: Path to JSONL
+- subagent_files: List of subagent paths
+- storage_path: Analysis storage location
+- session_serial: The S number
+```
+Meta-analyzer is token-efficient, reads subagents inline, focuses on patterns.
+
+**Group B INLINE (≤10 subagents) → inline-analyzer:**
+```
+Input:
+- session_file: Path to JSONL
+- subagent_files: List of subagent paths (≤10)
+- storage_path: Analysis storage location
+- session_serial: The S number
+```
+Inline-analyzer processes main session + all subagents in single pass.
+
+**Group B BEEFY (>10 subagents) → beefy pipeline:**
+```
+Stage 1: beefy-analyzer
+- Analyzes main session only
+- Produces intermediate report
+
+Stage 2: beefy-subagent-analyzer (× N batches)
+- Processes 5 subagents per batch
+- User-paced between batches (if configured)
+
+Stage 3: beefy-reporter
+- Assembles intermediate + all batch reports
+- Produces final combined report
+```
+
+**The only difference between groups is which analyzer is called.** All run in parallel at user-confirmed concurrency.
+
+**CRITICAL: All analyzers produce NARRATIVE MARKDOWN REPORTS, not JSON.**
 
 **Session Report Standards:**
 
