@@ -76,6 +76,33 @@ get_subagent_analyzed_count() {
     fi
 }
 
+# Function to get analysis timestamp from metadata
+get_analysis_timestamp() {
+    local session_id="$1"
+    local metadata_file="${ANALYSIS_DIR}/${session_id}/metadata.json"
+    if [ -f "$metadata_file" ]; then
+        jq -r '.analysis_timestamp // ""' "$metadata_file" 2>/dev/null || echo ""
+    else
+        echo ""
+    fi
+}
+
+# Function to format timestamp as human-readable "time ago"
+format_time_ago() {
+    local timestamp="$1"
+    [ -z "$timestamp" ] && echo "never" && return
+    local then_epoch now_epoch diff
+    then_epoch=$(date -j -f "%Y-%m-%dT%H:%M:%S" "${timestamp%%.*}" "+%s" 2>/dev/null) || { echo "unknown"; return; }
+    now_epoch=$(date "+%s")
+    diff=$((now_epoch - then_epoch))
+    if [ "$diff" -lt 60 ]; then echo "just now"
+    elif [ "$diff" -lt 3600 ]; then echo "$((diff / 60))m ago"
+    elif [ "$diff" -lt 86400 ]; then echo "$((diff / 3600))h ago"
+    elif [ "$diff" -lt 604800 ]; then echo "$((diff / 86400))d ago"
+    else echo "$((diff / 604800))w ago"
+    fi
+}
+
 # Function to get parent session ID from subagent file
 # Reads sessionId field from first line of JSONL
 get_parent_session_id() {
@@ -153,6 +180,9 @@ declare -A project_subagents
 declare -A project_subagent_messages
 declare -A project_subagent_bytes
 
+# Track last analysis timestamp per project
+declare -A project_last_analyzed
+
 # Store inventory entries for JSON output
 inventory_entries=()
 
@@ -166,6 +196,15 @@ for session_id in "${!session_files[@]}"; do
     unseen_count=$((msg_count - analyzed_count))
 
     project=$(get_project_name "$file")
+
+    # Track most recent analysis timestamp for this project
+    timestamp=$(get_analysis_timestamp "$session_id")
+    if [ -n "$timestamp" ]; then
+        current="${project_last_analyzed[$project]:-}"
+        if [ -z "$current" ] || [[ "$timestamp" > "$current" ]]; then
+            project_last_analyzed[$project]="$timestamp"
+        fi
+    fi
 
     # Find subagents for this session
     subagent_json_entries=()
@@ -336,6 +375,8 @@ else
         combined_bytes=$((bytes + sub_bytes))
         size=$(format_bytes $combined_bytes)
 
-        echo "  ${project}: ${sessions} sessions (${messages} msgs), ${subagents} subagents (${sub_msgs} msgs), ${size}"
+        last_ts="${project_last_analyzed[$project]:-}"
+        last_ago=$(format_time_ago "$last_ts")
+        echo "  ${project}: ${sessions} sessions (${messages} msgs), ${subagents} subagents (${sub_msgs} msgs), ${size} [last: ${last_ago}]"
     done
 fi

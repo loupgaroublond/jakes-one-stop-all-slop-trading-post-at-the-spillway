@@ -12,6 +12,9 @@ Format the output as a table for better readability. The script provides:
 - Main Sessions: unseen count, message count, size
 - Subagents: unseen count, message count, size
 - Combined Total
+- Per-project breakdown with "Last Analyzed" timestamp (shown as `[last: Xd ago]` or `[last: never]`)
+
+IMPORTANT: The "Last Analyzed" column is required - it shows when each project was last reviewed via /rest.
 
 Present the fatigue report in table format:
 
@@ -26,10 +29,10 @@ Present the fatigue report in table format:
 
 ### By Project
 
-| Project | Sessions | Msgs | Subagents | Sub Msgs | Total Size |
-|---------|----------|------|-----------|----------|------------|
-| project-a | X | Y | A | B | ZMB |
-| project-b | X | Y | A | B | ZMB |
+| Project | Sessions | Msgs | Subagents | Sub Msgs | Size | Last Analyzed |
+|---------|----------|------|-----------|----------|------|---------------|
+| project-a | X | Y | A | B | ZMB | 2d ago |
+| project-b | X | Y | A | B | ZMB | never |
 ```
 
 If no unseen sessions exist, simply report: "No unseen sessions - fatigue level: 0"

@@ -6,6 +6,18 @@
 
 ---
 
+## 2025-12-29 — "THE TEMPORAL AWARENESS UPDATE"
+
+How long has it been since you RESTED? Now you'll KNOW!
+
+### claude-rest-system v2.0.1
+
+- **Last Analysis Time per Project** — Fatigue report now shows `[last: Xd ago]` for each project, so you know which ones are falling behind on their REST!
+- Handles all edge cases: `never` for unanalyzed projects, `unknown` for malformed timestamps, and human-friendly time units (just now, Xm, Xh, Xd, Xw)
+
+
+---
+
 ## 2025-12-27 — "THE BEEFY UPDATE"
 
 Well well WELL, look who's been hitting the GYM! This release is so THICC it needed its own PROTOCOL!
