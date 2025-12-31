@@ -6,6 +6,37 @@
 
 ---
 
+## 2025-12-31 — "THE PRETTY NAMES UPDATE"
+
+Your fatigue reports just got a MAKEOVER! No more squinting at truncated paths!
+
+### claude-rest-system v2.2.0
+
+- **Location Display Names** — Configure human-readable names for each location! `~/Documents`, `/iCloud/Projects`, `/Work Laptop/Documents` — finally, paths that make SENSE!
+- **Enhanced peers schema** — Locations now support `{"path": "...", "name": "..."}` objects alongside legacy string format
+- **Box-style project grouping** — Each project gets its own visual box with `┌─`, `│`, `├─`, `└` characters for clear hierarchy
+- **Extra breathing room** — Blank line after project headers, 2-space padding between columns
+- **Simplified /yawn** — Command docs trimmed down since the script output speaks for itself
+
+
+---
+
+## 2025-12-30 — "THE UNIFIED SPILLWAY UPDATE"
+
+You've got projects on THIS machine, projects on THAT machine, and sessions EVERYWHERE! Now they all come together under ONE ROOF!
+
+### claude-rest-system v2.1.0
+
+- **Project Groups** — Define which paths are the SAME project across machines! `grug-brained-employee` on your laptop? Same as `grug-brained-employee` on your work machine? NOW THEY'RE UNIFIED!
+- **Global peers config** — `~/.claude/project-peers.json` maps human-friendly project names to all their physical locations (local + remote)
+- **Human-friendly project names** — No more staring at `-Users-yankee-Documents-Projects-jakes-one-stop-all-slop-tra...`! The project name is extracted from the path!
+- **Hierarchical fatigue report** — Each project shows a ROLLUP line plus indented location breakdowns. Finally see when iCloud and local paths both contribute to the same project!
+- **Per-location stats** — Track sessions, messages, subagents, and size for EACH physical location within a project
+- **Filtered other-machines** — Unconfigured peer sessions excluded until you add them to a project group via `/peers`
+
+
+---
+
 ## 2025-12-29 — "THE TEMPORAL AWARENESS UPDATE"
 
 How long has it been since you RESTED? Now you'll KNOW!

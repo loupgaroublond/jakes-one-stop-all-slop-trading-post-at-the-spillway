@@ -102,33 +102,34 @@ This ensures each analysis run starts clean and reports don't accumulate across 
 
 Sessions can exist in multiple locations (active, archived, peer copies). Deduplicate by session ID (UUID) with precedence order ensuring most current version is used.
 
+**Project Groups:** Check `~/.claude/project-peers.json` for configured project groups:
+```bash
+cat ~/.claude/project-peers.json 2>/dev/null
+```
+
+If configured, sessions from multiple locations are unified under a single project name:
+```json
+{
+  "grug-brained-employee": {
+    "local": ["-Users-yankee-Documents-Projects-grug-brained-employee"],
+    "work": ["-Users-ynemoy-Documents-grug-brained-employee"]
+  }
+}
+```
+
 **Discovery order (lowest to highest precedence):**
 
-1. **Peer sessions** (if configured):
-   Check for `.claude/project-peers.json` in the current project directory:
+1. **Peer sessions** (from project groups config):
+   For each project group, scan all configured peer paths (non-local machines):
    ```bash
-   cat .claude/project-peers.json 2>/dev/null
-   ```
-
-   If the file exists, it maps machine names to arrays of remote project paths:
-   ```json
-   {
-     "work": ["-Users-ynemoy-Documents-grug-brained-employee"],
-     "home": ["-Users-john-Projects-myproject"]
-   }
-   ```
-
-   For each machine and each remote-path in that machine's array, scan for sessions:
-   ```bash
-   # Example for machine "work" with remote-path "-Users-ynemoy-Documents-grug-brained-employee"
-   # Lowest precedence - remote copies may be stale
+   # Example: scanning "work" machine paths for "grug-brained-employee" group
    for file in ~/.claude/session-archives/other-machines/work/-Users-ynemoy-Documents-grug-brained-employee/**/*.jsonl(N); do
      session_id=$(basename "$file" .jsonl)
      sessions["$session_id"]="$file"
    done
    ```
 
-   **IMPORTANT:** You MUST read project-peers.json and iterate over ALL machines and ALL paths. Do not skip this step.
+   **IMPORTANT:** Iterate over ALL machines and ALL paths in the project groups config.
 
 2. **Archived sessions**:
    ```bash
@@ -149,6 +150,8 @@ Sessions can exist in multiple locations (active, archived, peer copies). Dedupl
    ```
 
 **Result:** `sessions` array contains exactly one path per unique session ID, preferring most current copy.
+
+**Note:** Unconfigured other-machines sessions are excluded from analysis. Use `/peers` to add them to a project group.
 
 **Identify agent logs**: Files matching `agent-*.jsonl` are subagent sessions. They are analyzed alongside regular sessions but serialize differently (see below).
 

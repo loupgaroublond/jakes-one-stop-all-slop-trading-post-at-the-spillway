@@ -2,6 +2,11 @@
 # Calculate and report fatigue level based on unseen session messages
 # Scans all session files and compares to analysis metadata
 # Writes JSON inventory to ~/.claude/analysis/fatigue_inventory.json
+#
+# Project groups are loaded from ~/.claude/project-peers.json to:
+# - Unify sessions from different locations under a single project name
+# - Filter other-machines to only include configured peers
+# - Show human-friendly project names in output
 
 set -eo pipefail
 
@@ -10,9 +15,146 @@ PROJECTS_DIR="${CLAUDE_DIR}/projects"
 ARCHIVE_DIR="${CLAUDE_DIR}/session-archives"
 ANALYSIS_DIR="${CLAUDE_DIR}/analysis/sessions"
 INVENTORY_FILE="${CLAUDE_DIR}/analysis/fatigue_inventory.json"
+PROJECT_PEERS_FILE="${CLAUDE_DIR}/project-peers.json"
 
 # Ensure analysis directory exists
 mkdir -p "${CLAUDE_DIR}/analysis"
+
+# Reverse lookup: "machine:encoded_path" -> "project_name"
+declare -A path_to_project
+
+# Reverse lookup: "machine:encoded_path" -> "display_name" (human-friendly)
+declare -A path_to_display_name
+
+# Forward lookup: "project_name" -> space-separated list of machines
+declare -A project_machines
+
+# Load project groups from ~/.claude/project-peers.json
+# Schema: { "project-name": { "machine": [{"path": "...", "name": "..."}, ...], ... }, ... }
+# Also supports legacy format: { "project-name": { "machine": ["path1", "path2"], ... }, ... }
+load_project_groups() {
+    if [ ! -f "$PROJECT_PEERS_FILE" ]; then
+        return
+    fi
+
+    # Parse the JSON and build lookup tables
+    # Handles both new format (objects with path/name) and legacy (plain strings)
+    while IFS= read -r line; do
+        local project machine path display_name
+        project=$(echo "$line" | jq -r '.project')
+        machine=$(echo "$line" | jq -r '.machine')
+        path=$(echo "$line" | jq -r '.path')
+        display_name=$(echo "$line" | jq -r '.name // empty')
+
+        if [ -n "$project" ] && [ -n "$machine" ] && [ -n "$path" ]; then
+            local key="${machine}:${path}"
+            path_to_project["$key"]="$project"
+
+            # Store display name if provided
+            if [ -n "$display_name" ]; then
+                path_to_display_name["$key"]="$display_name"
+            fi
+
+            # Track machines for each project
+            local existing="${project_machines[$project]:-}"
+            if [ -z "$existing" ]; then
+                project_machines[$project]="$machine"
+            elif [[ ! " $existing " =~ " $machine " ]]; then
+                project_machines[$project]="$existing $machine"
+            fi
+        fi
+    done < <(jq -c '
+        to_entries[] |
+        .key as $project |
+        .value | to_entries[] |
+        .key as $machine |
+        .value[] |
+        if type == "object" then
+            {project: $project, machine: $machine, path: .path, name: .name}
+        else
+            {project: $project, machine: $machine, path: ., name: null}
+        end
+    ' "$PROJECT_PEERS_FILE" 2>/dev/null)
+}
+
+# Check if an other-machines path is a configured peer
+is_configured_peer() {
+    local machine="$1"
+    local encoded_path="$2"
+    local key="${machine}:${encoded_path}"
+    [ -n "${path_to_project[$key]:-}" ]
+}
+
+# Get friendly project name from encoded path
+# Strips common prefixes (Users, Documents, Projects, etc.) and returns the project portion
+# e.g., "-Users-yankee-Documents-Projects-grug-brained-employee" -> "grug-brained-employee"
+# e.g., "-Users-yankee-Documents-Projects-jakes-one-stop-all-slop-trading-post-at-the-spillway" -> "jakes-one-stop-all-slop-trading-post-at-the-spillway"
+get_friendly_name_from_path() {
+    local encoded_path="$1"
+
+    # Remove leading dash
+    encoded_path="${encoded_path#-}"
+
+    # Split by dashes
+    local segments
+    IFS='-' read -ra segments <<< "$encoded_path"
+
+    # Find where the actual project name starts (after common prefixes)
+    local project_start=-1
+    # Common path segments to skip (handles both regular paths and iCloud paths)
+    local common_prefixes="Users Documents Projects Library Mobile CloudDocs com apple"
+
+    for ((i=0; i<${#segments[@]}; i++)); do
+        local seg="${segments[i]}"
+        # Skip empty segments and common path components
+        if [ -z "$seg" ]; then
+            continue
+        fi
+
+        # Check if this is a common prefix we should skip
+        local is_common=false
+        for prefix in $common_prefixes; do
+            if [ "$seg" = "$prefix" ]; then
+                is_common=true
+                break
+            fi
+        done
+
+        # Also skip username-like segments (typically follows "Users")
+        if [ $i -gt 0 ] && [ "${segments[i-1]}" = "Users" ]; then
+            is_common=true
+        fi
+
+        if [ "$is_common" = false ]; then
+            project_start=$i
+            break
+        fi
+    done
+
+    # If we found a project start, join from there to end
+    if [ $project_start -ge 0 ]; then
+        local result=""
+        for ((i=project_start; i<${#segments[@]}; i++)); do
+            if [ -n "${segments[i]}" ]; then
+                if [ -n "$result" ]; then
+                    result="${result}-${segments[i]}"
+                else
+                    result="${segments[i]}"
+                fi
+            fi
+        done
+        echo "$result"
+    else
+        # Fallback: just return the last non-empty segment
+        for ((i=${#segments[@]}-1; i>=0; i--)); do
+            if [ -n "${segments[i]}" ]; then
+                echo "${segments[i]}"
+                return
+            fi
+        done
+        echo "unknown"
+    fi
+}
 
 # Function to get message count from JSONL file
 get_message_count() {
@@ -114,23 +256,72 @@ get_parent_session_id() {
     fi
 }
 
-# Function to extract project name from file path
-# For other-machines, includes machine name: "machine:project"
-get_project_name() {
+# Function to extract project info from file path
+# Uses project groups lookup for configured paths, falls back to auto-naming
+# Returns: "project_name|machine|encoded_path" (pipe-separated for parsing)
+get_project_info() {
     local file="$1"
+    local machine=""
+    local encoded_path=""
+    local project_name=""
+
     # Check for other-machines path first
     if [[ "$file" =~ /session-archives/other-machines/([^/]+)/([^/]+)/ ]]; then
-        local machine="${BASH_REMATCH[1]}"
-        local project="${BASH_REMATCH[2]}"
-        echo "${machine}:${project}"
+        machine="${BASH_REMATCH[1]}"
+        encoded_path="${BASH_REMATCH[2]}"
+
+        # Check if this is a configured peer
+        local key="${machine}:${encoded_path}"
+        if [ -n "${path_to_project[$key]:-}" ]; then
+            project_name="${path_to_project[$key]}"
+        else
+            # Not configured - return empty to signal exclusion
+            echo ""
+            return
+        fi
     elif [[ "$file" =~ /projects/([^/]+)/ ]]; then
-        echo "${BASH_REMATCH[1]}"
+        encoded_path="${BASH_REMATCH[1]}"
+        machine="local"
+
+        # Check if this is in a project group
+        local key="local:${encoded_path}"
+        if [ -n "${path_to_project[$key]:-}" ]; then
+            project_name="${path_to_project[$key]}"
+        else
+            # Auto-name from path
+            project_name=$(get_friendly_name_from_path "$encoded_path")
+        fi
     elif [[ "$file" =~ /session-archives/([^/]+)/ ]]; then
-        echo "${BASH_REMATCH[1]}"
+        encoded_path="${BASH_REMATCH[1]}"
+        # Skip "other-machines" directory itself
+        if [ "$encoded_path" = "other-machines" ]; then
+            echo ""
+            return
+        fi
+        machine="local"
+
+        # Check if this is in a project group
+        local key="local:${encoded_path}"
+        if [ -n "${path_to_project[$key]:-}" ]; then
+            project_name="${path_to_project[$key]}"
+        else
+            # Auto-name from path
+            project_name=$(get_friendly_name_from_path "$encoded_path")
+        fi
     else
-        echo "unknown"
+        echo "unknown||"
+        return
     fi
+
+    # Return all three values pipe-separated
+    echo "${project_name}|${machine}|${encoded_path}"
 }
+
+# Track which machines contributed to each project (during session scan)
+declare -A observed_project_machines
+
+# Load project groups configuration
+load_project_groups
 
 # Collect all unique session files (prefer projects/ over archives/)
 declare -A session_files
@@ -170,18 +361,30 @@ for subagent_id in "${!subagent_files[@]}"; do
     fi
 done
 
-# Track unseen metrics by project (main sessions)
+# Track unseen metrics by project (main sessions) - rollup totals
 declare -A project_sessions
 declare -A project_messages
 declare -A project_bytes
 
-# Track subagent metrics separately
+# Track subagent metrics separately - rollup totals
 declare -A project_subagents
 declare -A project_subagent_messages
 declare -A project_subagent_bytes
 
 # Track last analysis timestamp per project
 declare -A project_last_analyzed
+
+# Track per-location stats within each project
+# Keys are "project|machine:path" for uniqueness
+declare -A location_sessions
+declare -A location_messages
+declare -A location_bytes
+declare -A location_subagents
+declare -A location_subagent_messages
+declare -A location_subagent_bytes
+
+# Track which locations belong to each project (space-separated "machine:path" entries)
+declare -A project_locations
 
 # Store inventory entries for JSON output
 inventory_entries=()
@@ -190,12 +393,48 @@ inventory_entries=()
 for session_id in "${!session_files[@]}"; do
     file="${session_files[$session_id]}"
 
+    # Get project info (returns "project|machine|encoded_path")
+    project_info=$(get_project_info "$file")
+
+    # Skip unconfigured other-machines sessions (empty result)
+    if [ -z "$project_info" ]; then
+        continue
+    fi
+
+    # Parse pipe-separated values
+    IFS='|' read -r project project_machine project_encoded_path <<< "$project_info"
+
+    # Skip if project is empty
+    if [ -z "$project" ]; then
+        continue
+    fi
+
+    # Build location key for per-location tracking
+    location_key="${project_machine}:${project_encoded_path}"
+    full_key="${project}|${location_key}"
+
+    # Track which locations belong to this project
+    existing_locations="${project_locations[$project]:-}"
+    if [ -z "$existing_locations" ]; then
+        project_locations[$project]="$location_key"
+    elif [[ ! " $existing_locations " =~ " $location_key " ]]; then
+        project_locations[$project]="$existing_locations $location_key"
+    fi
+
+    # Track which machines contributed to this project (for summary)
+    if [ -n "$project_machine" ]; then
+        existing_machines="${observed_project_machines[$project]:-}"
+        if [ -z "$existing_machines" ]; then
+            observed_project_machines[$project]="$project_machine"
+        elif [[ ! " $existing_machines " =~ " $project_machine " ]]; then
+            observed_project_machines[$project]="$existing_machines $project_machine"
+        fi
+    fi
+
     # Get message counts
     msg_count=$(get_message_count "$file")
     analyzed_count=$(get_analyzed_count "$session_id")
     unseen_count=$((msg_count - analyzed_count))
-
-    project=$(get_project_name "$file")
 
     # Track most recent analysis timestamp for this project
     timestamp=$(get_analysis_timestamp "$session_id")
@@ -222,16 +461,29 @@ for session_id in "${!session_files[@]}"; do
             if [ "$sub_unseen_count" -gt 0 ]; then
                 sub_file_size=$(get_file_size "$sub_file")
 
-                # Initialize project subagent counters if needed
+                # Initialize project subagent counters if needed (rollup)
                 if [ -z "${project_subagents[$project]:-}" ]; then
                     project_subagents[$project]=0
                     project_subagent_messages[$project]=0
                     project_subagent_bytes[$project]=0
                 fi
 
+                # Accumulate project-level (rollup)
                 project_subagents[$project]=$((project_subagents[$project] + 1))
                 project_subagent_messages[$project]=$((project_subagent_messages[$project] + sub_unseen_count))
                 project_subagent_bytes[$project]=$((project_subagent_bytes[$project] + sub_file_size))
+
+                # Initialize location subagent counters if needed
+                if [ -z "${location_subagents[$full_key]:-}" ]; then
+                    location_subagents[$full_key]=0
+                    location_subagent_messages[$full_key]=0
+                    location_subagent_bytes[$full_key]=0
+                fi
+
+                # Accumulate per-location
+                location_subagents[$full_key]=$((location_subagents[$full_key] + 1))
+                location_subagent_messages[$full_key]=$((location_subagent_messages[$full_key] + sub_unseen_count))
+                location_subagent_bytes[$full_key]=$((location_subagent_bytes[$full_key] + sub_file_size))
             fi
         fi
     done
@@ -260,17 +512,29 @@ for session_id in "${!session_files[@]}"; do
     if [ "$unseen_count" -gt 0 ]; then
         file_size=$(get_file_size "$file")
 
-        # Initialize project counters if needed
+        # Initialize project counters if needed (rollup)
         if [ -z "${project_sessions[$project]:-}" ]; then
             project_sessions[$project]=0
             project_messages[$project]=0
             project_bytes[$project]=0
         fi
 
-        # Accumulate by project
+        # Accumulate project-level (rollup)
         project_sessions[$project]=$((project_sessions[$project] + 1))
         project_messages[$project]=$((project_messages[$project] + unseen_count))
         project_bytes[$project]=$((project_bytes[$project] + file_size))
+
+        # Initialize location counters if needed
+        if [ -z "${location_sessions[$full_key]:-}" ]; then
+            location_sessions[$full_key]=0
+            location_messages[$full_key]=0
+            location_bytes[$full_key]=0
+        fi
+
+        # Accumulate per-location
+        location_sessions[$full_key]=$((location_sessions[$full_key] + 1))
+        location_messages[$full_key]=$((location_messages[$full_key] + unseen_count))
+        location_bytes[$full_key]=$((location_bytes[$full_key] + file_size))
     fi
 done
 
@@ -341,7 +605,7 @@ else
     echo "  Size: $(format_bytes $combined_bytes)"
     echo ""
 
-    # Show by project (sorted by combined message count descending)
+    # Show by project with hierarchical breakdown
     echo "By Project:"
 
     # Get all projects (union of main and subagent projects)
@@ -362,9 +626,13 @@ else
         sort_list+="${combined_msgs}:${project}"$'\n'
     done
 
-    # Sort numerically descending and display
-    echo "$sort_list" | sort -t: -k1 -nr | while IFS=: read -r _ project; do
+    # Sort numerically descending and display hierarchically
+    # Use process substitution to avoid subshell (needed to access associative arrays)
+    first_project=true
+    while IFS=: read -r _ project; do
         [ -z "$project" ] && continue
+
+        # Get rollup stats
         sessions=${project_sessions[$project]:-0}
         messages=${project_messages[$project]:-0}
         bytes=${project_bytes[$project]:-0}
@@ -377,6 +645,66 @@ else
 
         last_ts="${project_last_analyzed[$project]:-}"
         last_ago=$(format_time_ago "$last_ts")
-        echo "  ${project}: ${sessions} sessions (${messages} msgs), ${subagents} subagents (${sub_msgs} msgs), ${size} [last: ${last_ago}]"
-    done
+
+        # Blank line between projects (not before first)
+        if [ "$first_project" = true ]; then
+            first_project=false
+        else
+            echo ""
+        fi
+
+        # === PROJECT HEADER ===
+        echo ""
+        printf "  ┌─ %s " "$project"
+        # Fill with dashes to create visual separator
+        name_len=${#project}
+        dash_count=$((72 - name_len))
+        for ((i=0; i<dash_count; i++)); do printf "─"; done
+        printf " [%s]\n" "$last_ago"
+        printf "  │\n"
+
+        # === COLUMN HEADERS FOR THIS PROJECT ===
+        printf "  │ %-40s  %-8s %8s %6s %9s %8s %8s\n" "Location" "Machine" "Sessions" "Msgs" "Subagents" "Sub Msgs" "Size"
+        printf "  │ %-40s  %-8s %8s %6s %9s %8s %8s\n" "────────────────────────────────────────" "────────" "────────" "──────" "─────────" "────────" "────────"
+
+        # === PER-LOCATION ROWS ===
+        locations="${project_locations[$project]:-}"
+        for loc in $locations; do
+            full_key="${project}|${loc}"
+
+            loc_sessions=${location_sessions[$full_key]:-0}
+            loc_messages=${location_messages[$full_key]:-0}
+            loc_bytes=${location_bytes[$full_key]:-0}
+            loc_subagents=${location_subagents[$full_key]:-0}
+            loc_sub_msgs=${location_subagent_messages[$full_key]:-0}
+            loc_sub_bytes=${location_subagent_bytes[$full_key]:-0}
+
+            loc_combined_bytes=$((loc_bytes + loc_sub_bytes))
+            loc_size=$(format_bytes $loc_combined_bytes)
+
+            # Parse machine:path from location key
+            machine="${loc%%:*}"
+            encoded_path="${loc#*:}"
+
+            # Use display name if configured, otherwise truncate encoded path
+            display_name="${path_to_display_name[$loc]:-}"
+            if [ -n "$display_name" ]; then
+                display_path="$display_name"
+            else
+                display_path="$encoded_path"
+                if [ ${#display_path} -gt 40 ]; then
+                    display_path="...${display_path: -37}"
+                fi
+            fi
+
+            printf "  │ %-40s  %-8s %8d %6d %9d %8d %8s\n" \
+                "$display_path" "$machine" "$loc_sessions" "$loc_messages" "$loc_subagents" "$loc_sub_msgs" "$loc_size"
+        done
+
+        # === TOTAL ROW ===
+        printf "  ├─%-40s──%-8s─%8s─%6s─%9s─%8s─%8s\n" "────────────────────────────────────────" "────────" "────────" "──────" "─────────" "────────" "────────"
+        printf "  └ %-40s  %-8s %8d %6d %9d %8d %8s\n" \
+            "TOTAL" "" "$sessions" "$messages" "$subagents" "$sub_msgs" "$size"
+
+    done < <(echo "$sort_list" | sort -t: -k1 -nr)
 fi

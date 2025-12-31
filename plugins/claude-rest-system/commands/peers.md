@@ -2,67 +2,134 @@
 description: Discover and configure peer projects from other machines
 ---
 
-# Peer Project Discovery
+# Project Groups Configuration
 
-Help the user discover and configure peer projects from other machines for cross-machine rest analysis.
+Help the user configure project groups to unify sessions from multiple locations under a single project name.
+
+## Concept
+
+The same conceptual "project" can exist in multiple physical locations:
+- Local directories (e.g., `~/Documents`, `/iCloud/Projects`)
+- Other machines (synced via `~/.claude/session-archives/other-machines/`)
+
+**Project groups** map a human-friendly project name to all physical locations, enabling:
+- Unified fatigue reporting (`/yawn`)
+- Cross-machine session analysis (`/rest`)
+- Session deduplication by UUID
+
+## Config Location
+
+**Global config**: `~/.claude/project-peers.json`
+
+## Schema
+
+```json
+{
+  "grug-brained-employee": {
+    "local": [
+      {"path": "-Users-yankee-Library-Mobile-Documents-com-apple-CloudDocs-Projects-grug-brained-employee", "name": "/iCloud/Projects"},
+      {"path": "-Users-yankee-Documents-grug-brained-employee", "name": "~/Documents"}
+    ],
+    "work": [
+      {"path": "-Users-ynemoy-Documents-grug-brained-employee", "name": "/Work Laptop/Documents"}
+    ]
+  },
+  "spillway": {
+    "local": [
+      {"path": "-Users-yankee-Documents-Projects-jakes-one-stop-all-slop-trading-post-at-the-spillway", "name": "~/Documents/Projects"}
+    ]
+  }
+}
+```
+
+- **Top-level key**: Human-friendly project name (shown in fatigue report header)
+- **Second level**: Machine name ("local" for this machine, others from other-machines/)
+- **Values**: Array of location objects:
+  - `path`: Encoded session-archive path (uses `-` as separator)
+  - `name`: Display name shown in fatigue report (e.g., `~/Documents`, `/iCloud/Projects`, `/Work Laptop/Documents`)
 
 ## Workflow
 
-### 1. Identify Current Project
+### 1. Scan Available Paths
 
-Determine the current project path (the Claude project path format, e.g., `-Users-{username}-...-project-name`).
-
-### 2. Scan Other Machines
-
-List all projects found in `~/.claude/session-archives/other-machines/`:
+List all session paths found locally and on other machines:
 
 ```bash
+# Local projects
+ls ~/.claude/projects/
+
+# Local archives
+ls ~/.claude/session-archives/ | grep -v other-machines
+
+# Other machines
 ls ~/.claude/session-archives/other-machines/*/
 ```
 
-For each machine, list the project paths available.
+### 2. Show Current Config
 
-### 3. Suggest Likely Matches
+Read and display existing configuration:
 
-Compare project names (the last component of the path) to find likely matches:
-- Exact name match → **Strong match**
-- Similar name (substring, case-insensitive) → **Possible match**
-- Different name → Listed but not highlighted
+```bash
+cat ~/.claude/project-peers.json 2>/dev/null || echo "{}"
+```
+
+### 3. Identify Ungrouped Paths
+
+Compare discovered paths against configuration. For each ungrouped path:
+- Extract the project name from the path (last meaningful component)
+- Suggest grouping with paths that have matching project names
+- Suggest appropriate display names based on path structure
+
+### 4. Suggest Groups
 
 Present findings to the user:
 
 ```
-## Projects on other machines
+## Ungrouped Paths
 
-### work (strong matches)
-- `-Users-workuser-projects-totally-not-skynet` ← likely same as current project
+### Local
+- -Users-yankee-Documents-Projects-new-project
+  Suggested: project="new-project", name="~/Documents/Projects"
 
-### work (other projects)
-- `-Users-workuser-projects-shitty-day-job-at-the-spillway`
-- `-Users-workuser-projects-side-hustle`
-- `-Users-workuser-documents-secret-plans`
+### work (other machine)
+- -Users-ynemoy-Documents-grug-brained-employee
+  Suggested: add to "grug-brained-employee", name="/Work/Documents"
 
-Current project: `-Users-{username}-...-totally-not-skynet`
+## Suggested Groups
+
+"grug-brained-employee" could include:
+  - local: /iCloud/Projects (existing)
+  - work: /Work Laptop/Documents (new - same project name)
+
+Add work path to "grug-brained-employee" group? [Y/n]
 ```
 
-### 4. Configure Peers
+### 5. Update Config
 
-Ask the user which projects to add as peers. When they confirm, update `.claude/project-peers.json` in the current project directory:
+When the user confirms, update `~/.claude/project-peers.json` with the new location object.
 
-```json
-{
-  "work": "-Users-workuser-projects-totally-not-skynet"
-}
-```
+### 6. Confirm
 
-If the file doesn't exist, create it. If it exists, merge the new peers.
+Show the updated configuration and explain:
+- `/yawn` will now group sessions under the project name
+- `/rest` will analyze sessions from all locations in the group
+- Sessions are deduplicated by UUID (most current copy wins)
 
-### 5. Confirm
+## Display Name Conventions
 
-Show the updated peer configuration and explain that `/rest` will now include sessions from peer projects.
+Use path-style names that indicate where the project lives:
+- `~/Documents` - Home Documents folder
+- `~/Documents/Projects` - Projects subfolder
+- `/iCloud/Projects` - iCloud Drive Projects folder
+- `~/.claude` - Claude config directory
+- `/Work Laptop/Documents` - Other machine's Documents
 
-## Notes
+## Behavior Notes
 
-- The `.claude/project-peers.json` file lives in the **project directory**, not `~/.claude`
-- Multiple machines can be configured as peers
-- Peer paths are the remote project paths as they appear in `other-machines/{machine}/`
+- **Ungrouped local paths**: Automatically included in `/yawn` with auto-generated names
+- **Ungrouped other-machines paths**: Excluded until explicitly added to a group
+- **Precedence**: local > archived > peer (for deduplication)
+
+## User Instructions
+
+$ARGUMENTS
