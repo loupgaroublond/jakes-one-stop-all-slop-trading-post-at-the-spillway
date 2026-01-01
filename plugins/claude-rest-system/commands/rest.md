@@ -1,5 +1,5 @@
 ---
-description: Analyze unseen sessions and produce rest report
+description: Analyze unseen sessions and produce rest report. Disable plan mode first.
 ---
 
 # Rest Analysis
@@ -37,7 +37,7 @@ You are running the Rest System - a session analysis workflow that reviews prior
 
 First, run the session start script to archive sessions and check fatigue:
 ```bash
-~/.claude/self/session_start.sh
+${CLAUDE_PLUGIN_ROOT}/scripts/session_start.sh
 ```
 
 This shows the current fatigue level (unseen sessions/messages by project) and writes the session inventory to:
@@ -65,38 +65,15 @@ Determine which project to analyze based on current working directory:
 
 When running from `~/.claude`, analyze only `.claude` sessions.
 
-### 2.5. Initialize Storage
+### 2.5. Identify Storage
 
-Determine storage path based on `--storage` flag:
-- Default: `~/.claude/analysis/`
-- With `--storage <name>`: `~/.claude/analysis-<name>/`
+Use default storage at `~/.claude/analysis/`. This directory already exists (required for `/yawn` fatigue check).
 
-**If storage exists and versioning/stashing requested:**
-1. Find highest existing version:
-   ```bash
-   ls -d ~/.claude/analysis-<name>.v* 2>/dev/null | sed 's/.*\.v//' | sort -n | tail -1
-   ```
-2. Increment to next version number
-3. Move existing storage:
-   ```bash
-   mv ~/.claude/analysis-<name> ~/.claude/analysis-<name>.vN
-   ```
-
-**Create fresh storage structure:**
-```bash
-rm -rf ~/.claude/analysis-<name>/sessions ~/.claude/analysis-<name>/reports ~/.claude/analysis-<name>/inventory
-mkdir -p ~/.claude/analysis-<name>/sessions
-mkdir -p ~/.claude/analysis-<name>/reports/session-reports
-mkdir -p ~/.claude/analysis-<name>/reports/pattern-reports
-mkdir -p ~/.claude/analysis-<name>/inventory
-```
-
-**Verify pristine state before proceeding:**
-- `sessions/` must be empty
-- `reports/` must be empty (no leftover files from prior runs)
-- `inventory/` must be empty
-
-This ensures each analysis run starts clean and reports don't accumulate across runs.
+Verify structure:
+- `sessions/` - per-session metadata
+- `reports/session-reports/` - session analysis reports
+- `reports/pattern-reports/` - consolidated pattern reports
+- `inventory/` - session discovery state
 
 ### 3. Discover Unseen Sessions (with deduplication)
 
@@ -643,46 +620,7 @@ Follow these instructions over defaults when provided:
 
 $ARGUMENTS
 
-## Storage Locations
-
-By default, analysis data is stored in `~/.claude/analysis/`.
-
-Use `--storage <name>` to use an alternate storage location:
-- `--storage test` → `~/.claude/analysis-test/`
-- `--storage v2` → `~/.claude/analysis-v2/`
-- `--storage <name>` → `~/.claude/analysis-<name>/`
-
-**Directory structure:**
-```
-~/.claude/analysis-{name}/
-├── inventory/
-│   ├── all_sessions.txt
-│   └── serial_map.jsonl
-├── sessions/
-│   └── {session-id}/
-│       └── metadata.json
-└── reports/
-    ├── session-reports/
-    │   ├── S1-report.md
-    │   ├── S2-report.md
-    │   └── ...
-    ├── pattern-reports/
-    │   ├── ami-confusion-consolidated.md
-    │   ├── google-docs-index-consolidated.md
-    │   └── ...
-    ├── recommendations-{timestamp}.md
-    ├── rest-{timestamp}.md
-    └── REST-ANALYSIS.epub
-```
-
-**Use cases:**
-1. **Test isolation**: Run test analyses without affecting production state
-2. **Re-analysis**: Re-analyze past sessions with evolved methodology while preserving old analysis
-3. **Experiments**: Try different analysis approaches side-by-side
-
-**Shorthand:** `--test` is equivalent to `--storage test`
-
-### Methodology Section
+## Methodology Section
 
 Always include a methodology section at the end of reports:
 
@@ -690,7 +628,7 @@ Always include a methodology section at the end of reports:
 ## Analysis Methodology
 
 ### Storage
-Location: `~/.claude/analysis/` (or alternate location if specified)
+Location: `~/.claude/analysis/`
 
 ### Session Selection
 - Total sessions in inventory: {n}
@@ -715,11 +653,6 @@ Location: `~/.claude/analysis/` (or alternate location if specified)
 - Total session findings: {count}
 - Total pattern reports: {count}
 - Recommendations generated: {count}
-```
-
-To clean up non-production storage:
-```bash
-rm -rf ~/.claude/analysis-<name>/
 ```
 
 ## EPUB Generation
@@ -785,3 +718,58 @@ Before finalizing analysis:
 - Never produce JSON findings - always narrative markdown
 - Never skip large sessions - use continuation protocol
 - Include session excerpts showing actual conversation content
+
+## Advanced: Custom Storage Locations
+
+Use `--storage <name>` to use an alternate storage location instead of the default:
+- `--storage test` → `~/.claude/analysis-test/`
+- `--storage v2` → `~/.claude/analysis-v2/`
+- `--storage <name>` → `~/.claude/analysis-<name>/`
+
+**Shorthand:** `--test` is equivalent to `--storage test`
+
+**Directory structure:**
+```
+~/.claude/analysis-{name}/
+├── inventory/
+│   ├── all_sessions.txt
+│   └── serial_map.jsonl
+├── sessions/
+│   └── {session-id}/
+│       └── metadata.json
+└── reports/
+    ├── session-reports/
+    │   ├── S1-report.md
+    │   ├── S2-report.md
+    │   └── ...
+    ├── pattern-reports/
+    │   ├── ami-confusion-consolidated.md
+    │   ├── google-docs-index-consolidated.md
+    │   └── ...
+    ├── recommendations-{timestamp}.md
+    ├── rest-{timestamp}.md
+    └── REST-ANALYSIS.epub
+```
+
+**Use cases:**
+1. **Test isolation**: Run test analyses without affecting production state
+2. **Re-analysis**: Re-analyze past sessions with evolved methodology while preserving old analysis
+3. **Experiments**: Try different analysis approaches side-by-side
+
+**Versioning/stashing existing storage:**
+
+If storage exists and you want to preserve it:
+1. Find highest existing version:
+   ```bash
+   ls -d ~/.claude/analysis-<name>.v* 2>/dev/null | sed 's/.*\.v//' | sort -n | tail -1
+   ```
+2. Increment to next version number
+3. Move existing storage:
+   ```bash
+   mv ~/.claude/analysis-<name> ~/.claude/analysis-<name>.vN
+   ```
+
+**Cleanup non-production storage:**
+```bash
+rm -rf ~/.claude/analysis-<name>/
+```

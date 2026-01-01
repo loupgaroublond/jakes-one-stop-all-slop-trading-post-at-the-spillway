@@ -6,6 +6,21 @@
 
 ---
 
+## 2025-12-31 — "THE DOC CLEANUP UPDATE"
+
+Spring cleaning at the spillway! Well, NEW YEAR'S cleaning! Same thing!
+
+### claude-rest-system v2.2.1
+
+- **Removed ~/.claude/self/ references** — Plugin now uses its own scripts directory (`${CLAUDE_PLUGIN_ROOT}/scripts/`) instead of deprecated user-level paths
+- **Happy path first in rest.md** — Reorganized documentation so the DEFAULT workflow is front and center, custom storage options moved to "Advanced" section at the end
+- **Plan mode warning** — Command description now reminds users to disable plan mode before running `/rest`
+- **Simplified section 2.5** — Now "Identify Storage" instead of "Initialize Storage" since the directory already exists for fatigue to work
+- **Fixed SETUP.md** — Removed `~/.claude/self` mkdir, sync.conf path simplified to `~/.claude/sync.conf`
+
+
+---
+
 ## 2025-12-31 — "THE PRETTY NAMES UPDATE"
 
 Your fatigue reports just got a MAKEOVER! No more squinting at truncated paths!

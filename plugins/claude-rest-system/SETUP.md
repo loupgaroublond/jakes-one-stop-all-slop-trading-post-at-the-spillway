@@ -34,13 +34,12 @@ Or manually create:
 mkdir -p ~/.claude/analysis/reports
 mkdir -p ~/.claude/analysis/sessions
 mkdir -p ~/.claude/session-archives
-mkdir -p ~/.claude/self
 ```
 
 
 ### Optional: Multi-Machine Sync
 
-Create `~/.claude/self/sync.conf` to sync sessions across machines:
+Create `~/.claude/sync.conf` to sync sessions across machines:
 
 ```bash
 # Multi-Machine Session Sync Configuration
