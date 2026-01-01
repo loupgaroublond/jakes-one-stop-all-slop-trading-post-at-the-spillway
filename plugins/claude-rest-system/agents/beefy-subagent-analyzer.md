@@ -22,6 +22,7 @@ You will receive:
 - `subagent_files`: List of up to 5 subagent file paths for this batch
 - `intermediate_report`: The report from beefy-analyzer with main session findings and context
 - `storage_path`: Base path for analysis storage
+- `run_reports_dir`: Run-specific reports directory (e.g., `~/.claude/analysis/reports/project-slug/2025-12-31-14-30/`)
 - `session_id`: The main session ID
 - `session_serial`: The S number (e.g., "S7")
 - `batch_number`: Which batch this is (1, 2, 3...)

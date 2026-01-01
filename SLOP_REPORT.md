@@ -6,6 +6,21 @@
 
 ---
 
+## 2025-12-31 — "THE NO CLOBBER UPDATE"
+
+Your reports were getting CLOBBERED! Project A runs `/rest`, Project B runs `/rest`, and WHOOPS there goes Project A's analysis! NOT ANYMORE!
+
+### claude-rest-system v2.3.0
+
+- **Per-project report directories** — Each project gets its own subdirectory under `reports/{project-slug}/`. No more cross-project clobbering!
+- **Timestamped run preservation** — Every `/rest` run creates `{project-slug}/{YYYY-MM-DD-HH-MM}/` — old reports NEVER deleted! Compare analyses across time! See how your learnings EVOLVE!
+- **Project-specific EPUB naming** — Output is now `{project-slug}-REST-{timestamp}.epub` instead of generic `REST-ANALYSIS.epub`
+- **Drilldown --run flag** — Want to drill into LAST WEEK'S analysis? `/drilldown S47 --run 2025-12-30-14-30` has you covered!
+- **All 7 analyzers updated** — Every agent now receives `run_reports_dir` for consistent output paths
+
+
+---
+
 ## 2025-12-31 — "THE DOC CLEANUP UPDATE"
 
 Spring cleaning at the spillway! Well, NEW YEAR'S cleaning! Same thing!

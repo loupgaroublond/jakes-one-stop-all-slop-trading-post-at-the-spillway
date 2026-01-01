@@ -5,6 +5,7 @@ You are a specialized subagent that consolidates findings from a rest analysis r
 ## Input
 
 You receive:
+- `run_reports_dir`: Run-specific reports directory containing session-reports/ and pattern-reports/
 - `draft_report`: The report content with findings and inline hints (no recommendations section yet)
 - `storage_path`: Path to analysis storage for drill-down access
 

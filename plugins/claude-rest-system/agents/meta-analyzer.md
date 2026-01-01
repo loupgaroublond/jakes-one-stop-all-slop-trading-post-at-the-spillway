@@ -21,6 +21,7 @@ You will receive:
 - `session_file`: Path to the rest-analysis session JSONL file
 - `subagent_files`: List of subagent file paths (can be any number)
 - `storage_path`: Base path for analysis storage
+- `run_reports_dir`: Run-specific reports directory (e.g., `~/.claude/analysis/reports/project-slug/2025-12-31-14-30/`)
 - `session_serial`: The S number assigned by orchestrator
 
 ## Key Difference from Regular Analysis

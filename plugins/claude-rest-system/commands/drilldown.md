@@ -9,7 +9,7 @@ Interactive, multi-tier deep-dive into findings from `/rest` analysis.
 ## Usage
 
 ```
-/drilldown <target>
+/drilldown <target> [--run <timestamp>]
 ```
 
 **Targets:**
@@ -17,6 +17,10 @@ Interactive, multi-tier deep-dive into findings from `/rest` analysis.
 - Session serial: `/drilldown S47`
 - Message range: `/drilldown S47 M#120-135`
 - Free-form: `/drilldown path quoting issues`
+
+**Options:**
+- `--run <timestamp>`: Drill into a specific analysis run (e.g., `--run 2025-12-30-14-30`)
+- Without `--run`: Uses the most recent analysis run for the current project
 
 ## User Input
 
@@ -42,40 +46,68 @@ Extract from user input:
 - Message range: `M#\d+-\d+` or `M#\d+`
 - Keywords: remaining text
 
-### 2. Locate Source Findings
+### 2. Determine Project and Run
 
-Find the most recent analysis to drill into:
+First, identify the current project and analysis run:
 
 ```bash
-# Find latest quick analysis files
-ls -t ~/.claude/analysis/sessions/*/quick-*.json | head -5
+# Derive project slug from current working directory
+PROJECT_SLUG=$(basename "$PWD" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
 
-# Or find existing drill-downs to continue from
+# Find the latest run (or use --run parameter)
+if [[ -n "$RUN_TIMESTAMP" ]]; then
+    RUN_REPORTS_DIR="~/.claude/analysis/reports/${PROJECT_SLUG}/${RUN_TIMESTAMP}"
+else
+    # Default to most recent run
+    LATEST_RUN=$(ls -1 "~/.claude/analysis/reports/${PROJECT_SLUG}" 2>/dev/null | sort -r | head -1)
+    RUN_REPORTS_DIR="~/.claude/analysis/reports/${PROJECT_SLUG}/${LATEST_RUN}"
+fi
+
+echo "Drilling into: $RUN_REPORTS_DIR"
+```
+
+### 3. Locate Source Reports
+
+Find session and pattern reports in the run directory:
+
+```bash
+# List session reports
+ls "$RUN_REPORTS_DIR/session-reports/"*.md
+
+# List pattern reports
+ls "$RUN_REPORTS_DIR/pattern-reports/"*.md
+
+# Find existing drill-downs (stored in sessions/)
 ls -t ~/.claude/analysis/sessions/*/drill-*.json | head -5
 ```
 
-### 3. Search for Target
+### 4. Search for Target
 
 **If finding ID (S3 T1):**
 ```bash
-# Search all quick-*.json for the finding ID
-grep -l '"id": "T1"' ~/.claude/analysis/sessions/*/quick-*.json
-# Then filter by session_serial: "S3"
+# Look in session report for the finding
+grep -l "T1" "$RUN_REPORTS_DIR/session-reports/S3-report.md"
 ```
 
 **If session serial (S47):**
 ```bash
-# Find session with that serial number
-grep -l '"serial_number": 47' ~/.claude/analysis/sessions/*/metadata.json
+# Read the session report directly
+cat "$RUN_REPORTS_DIR/session-reports/S47-report.md"
+```
+
+**If pattern name:**
+```bash
+# Look in pattern reports
+grep -l "path quoting" "$RUN_REPORTS_DIR/pattern-reports/"*.md
 ```
 
 **If keywords:**
 ```bash
-# Search findings for matching text
-grep -l "path quoting" ~/.claude/analysis/sessions/*/*.json
+# Search all reports in the run
+grep -r "path quoting" "$RUN_REPORTS_DIR/"
 ```
 
-### 4. Extract Evidence
+### 5. Extract Evidence
 
 For each matching finding, get the actual session content:
 
@@ -87,7 +119,7 @@ jq '.findings[] | select(.id == "T1") | .evidence_range' quick-*.json
 ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start> <end>
 ```
 
-### 5. Present Detailed Evidence
+### 6. Present Detailed Evidence
 
 Format with actual content, not summaries:
 
@@ -118,7 +150,7 @@ cp: target 'Documents' is not a directory
 [Similar detailed breakdown...]
 ```
 
-### 6. Store Drill-Down
+### 7. Store Drill-Down
 
 Save for potential further drill-down:
 
@@ -148,7 +180,7 @@ Save for potential further drill-down:
 }
 ```
 
-### 7. Offer Further Drill-Down
+### 8. Offer Further Drill-Down
 
 After presenting, suggest next steps:
 
@@ -175,8 +207,17 @@ Each tier's `parent` field links back, creating a traceable chain.
 
 ## Storage Location
 
-Uses same storage as `/rest`:
+Uses same storage structure as `/rest`:
 - Default: `~/.claude/analysis/`
 - With `--storage test`: `~/.claude/analysis-test/`
 
-Inherits storage location from the findings being drilled into.
+**Report location:** `{storage}/reports/{project-slug}/{run-timestamp}/`
+
+Each run is preserved. Use `--run <timestamp>` to drill into older analyses:
+```bash
+# List available runs for current project
+ls ~/.claude/analysis/reports/${PROJECT_SLUG}/
+
+# Drill into a specific run
+/drilldown S47 --run 2025-12-30-14-30
+```

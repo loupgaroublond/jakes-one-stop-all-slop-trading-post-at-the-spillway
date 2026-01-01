@@ -22,6 +22,7 @@ You will receive:
 - `session_file`: Path to the main JSONL session file
 - `subagent_files`: List of ALL subagent file paths (>10 files)
 - `storage_path`: Base path for analysis storage
+- `run_reports_dir`: Run-specific reports directory (e.g., `~/.claude/analysis/reports/project-slug/2025-12-31-14-30/`)
 - `session_serial`: The S number assigned by orchestrator
 
 ## Your Scope

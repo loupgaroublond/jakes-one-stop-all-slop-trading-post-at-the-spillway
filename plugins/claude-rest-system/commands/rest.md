@@ -57,22 +57,38 @@ The inventory includes main sessions with their subagents:
 ]
 ```
 
-### 2. Identify Current Project
+### 2. Identify Current Project and Generate Slug
 
 Determine which project to analyze based on current working directory:
 - Extract project path from `pwd`
 - Map to session directory pattern: `~/.claude/projects/{encoded-project-path}/`
 
-When running from `~/.claude`, analyze only `.claude` sessions.
+**Generate `project_slug` for report organization:**
+- Use configured name from `project-peers.json` if available
+- Otherwise derive from path (strip common prefixes like Users/Documents/Projects)
+- Sanitize: lowercase, replace spaces/special chars with dashes, truncate to 50 chars
+- Example: `Jake's One-Stop Trading Post` → `jakes-one-stop-trading-post`
 
-### 2.5. Identify Storage
+When running from `~/.claude`, use slug `claude-config`.
+
+### 2.5. Identify Storage and Create Run Directory
 
 Use default storage at `~/.claude/analysis/`. This directory already exists (required for `/yawn` fatigue check).
 
+**Create project + run directories (preserves history):**
+```bash
+RUN_TIMESTAMP=$(date "+%Y-%m-%d-%H-%M")
+RUN_REPORTS_DIR="${storage}/reports/${project_slug}/${RUN_TIMESTAMP}"
+mkdir -p "${RUN_REPORTS_DIR}/session-reports"
+mkdir -p "${RUN_REPORTS_DIR}/pattern-reports"
+```
+
+Each analysis run gets its own timestamped subdirectory - old reports are never deleted.
+
 Verify structure:
-- `sessions/` - per-session metadata
-- `reports/session-reports/` - session analysis reports
-- `reports/pattern-reports/` - consolidated pattern reports
+- `sessions/` - per-session metadata (shared across runs)
+- `reports/{project_slug}/{run_timestamp}/session-reports/` - session analysis reports
+- `reports/{project_slug}/{run_timestamp}/pattern-reports/` - consolidated pattern reports
 - `inventory/` - session discovery state
 
 ### 3. Discover Unseen Sessions (with deduplication)
@@ -227,6 +243,7 @@ Input:
 - session_file: Path to JSONL
 - subagent_files: List of subagent paths
 - storage_path: Analysis storage location
+- run_reports_dir: Run-specific reports directory
 - session_serial: The S number
 ```
 Meta-analyzer is token-efficient, reads subagents inline, focuses on patterns.
@@ -237,6 +254,7 @@ Input:
 - session_file: Path to JSONL
 - subagent_files: List of subagent paths (≤10)
 - storage_path: Analysis storage location
+- run_reports_dir: Run-specific reports directory
 - session_serial: The S number
 ```
 Inline-analyzer processes main session + all subagents in single pass.
@@ -263,7 +281,7 @@ Stage 3: beefy-reporter
 **Session Report Standards:**
 
 Each session analyzer writes a markdown report to:
-`{storage_path}/reports/session-reports/{session-serial}-report.md`
+`{run_reports_dir}/session-reports/{session-serial}-report.md`
 
 **Required report structure:**
 
@@ -360,13 +378,13 @@ For sessions > 500 messages:
 
 2. **Count actual reports generated:**
    ```bash
-   ls {storage}/reports/session-reports/S*-report.md | wc -l
+   ls {run_reports_dir}/session-reports/S*-report.md | wc -l
    ```
 
 3. **Identify gaps** - sessions with >= 20 messages but no report:
    ```bash
    for serial in $(seq 1 {max_serial}); do
-     if [[ ! -f {storage}/reports/session-reports/S${serial}-report.md ]]; then
+     if [[ ! -f {run_reports_dir}/session-reports/S${serial}-report.md ]]; then
        jq -r "select(.serial == \"S$serial\") | select(.messages >= 20) | \"\(.serial): \(.messages) msgs\"" \
          {storage}/inventory/serial_map.jsonl
      fi
@@ -393,7 +411,7 @@ For sessions > 500 messages:
 
 After all session reports are complete, the orchestrator:
 
-1. Read all session reports from `{storage}/reports/session-reports/`
+1. Read all session reports from `{run_reports_dir}/session-reports/`
 2. Extract "Potential Pattern Connections" sections
 3. Identify patterns mentioned across multiple sessions
 4. Group related findings by theme
@@ -426,7 +444,7 @@ For each identified pattern, spawn a **pattern-consolidator** subagent:
 - `pattern_name`: e.g., "AMI naming confusion"
 - `session_reports`: List of relevant session report paths
 - `finding_references`: Which findings (T numbers) relate to this pattern
-- `storage_path`: Analysis storage path
+- `run_reports_dir`: Run-specific reports directory
 
 **Pattern consolidator task:**
 1. Read the relevant session reports (full narrative, not summaries)
@@ -440,7 +458,7 @@ For each identified pattern, spawn a **pattern-consolidator** subagent:
 
 **Pattern Report Standards:**
 
-Write to: `{storage_path}/reports/pattern-reports/{pattern-slug}-consolidated.md`
+Write to: `{run_reports_dir}/pattern-reports/{pattern-slug}-consolidated.md`
 
 **Maximum length:** Up to 2x the average length of the contributing session findings.
 
@@ -498,9 +516,7 @@ Write to: `{storage_path}/reports/pattern-reports/{pattern-slug}-consolidated.md
 ### 8. Assemble Recommendations
 
 After pattern reports are complete, spawn **recommendations-assembler** subagent with:
-- `session_reports_dir`: Path to session reports
-- `pattern_reports_dir`: Path to pattern reports
-- `storage_path`: Analysis storage path
+- `run_reports_dir`: Run-specific reports directory (contains session-reports/ and pattern-reports/)
 
 The assembler will:
 1. Read all session reports and pattern reports (narrative content)
@@ -511,7 +527,7 @@ The assembler will:
 6. Deduplicate and merge related suggestions
 
 **Recommendations output:**
-Write to: `{storage_path}/reports/recommendations-{timestamp}.md`
+Write to: `{run_reports_dir}/recommendations.md`
 
 ### 9. Generate Final Report
 
@@ -576,27 +592,27 @@ Session reports available in appendix for detailed evidence:
 - ...
 ```
 
-**Save to:** `{storage}/reports/rest-{YYYY-MM-DD}-{HH-MM}.md`
+**Save to:** `{run_reports_dir}/rest.md`
 
 ### 10. EPUB Generation and Verification
 
 Before generating EPUB, verify all expected content is present:
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh "${storage}" "${project_slug}" "${RUN_TIMESTAMP}"
 ```
 
 **Pre-flight checks (performed by script):**
-- [ ] At least one `rest-*.md` final report exists
-- [ ] Recommendations file exists if patterns were found
+- [ ] `rest.md` final report exists in run directory
+- [ ] `recommendations.md` exists if patterns were found
 - [ ] All referenced session reports exist
 - [ ] All referenced pattern reports exist
 - [ ] Total word count exceeds minimum threshold
 
 **EPUB includes (in order):**
 1. Book info and table of contents
-2. Final report (`rest-*.md`)
-3. Recommendations (`recommendations-*.md`)
+2. Final report (`rest.md`)
+3. Recommendations (`recommendations.md`)
 4. Pattern reports (`pattern-reports/*.md`)
 5. Session reports (`session-reports/*.md`) - as appendix
 
@@ -660,14 +676,14 @@ Location: `~/.claude/analysis/`
 For large analyses or offline reading, generate an EPUB:
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh [storage-path]
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh "${storage}" "${project_slug}" "${RUN_TIMESTAMP}"
 ```
 
 **Automatic trigger:** If `--epub` is passed OR analysis exceeds 1000 messages, generate EPUB after report.
 
-**Manual generation:** Run the script anytime to package existing reports.
+**Manual generation:** Run the script anytime to package existing reports from a specific run.
 
-**Output:** `{storage}/reports/REST-ANALYSIS.epub` - opens automatically in Books.app.
+**Output:** `{run_reports_dir}/{project_slug}-REST-{RUN_TIMESTAMP}.epub` - opens automatically in Books.app.
 
 The EPUB includes:
 - Final rest analysis report
@@ -675,6 +691,11 @@ The EPUB includes:
 - Pattern consolidation reports
 - Session reports (as appendix)
 - Table of contents for navigation
+
+**Browsing old analyses:** Each run is preserved in its own timestamped directory. To regenerate an EPUB from an older run:
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_build_epub.sh ~/.claude/analysis project-slug 2025-12-30-14-30
+```
 
 ## Drill-Down
 
@@ -738,17 +759,19 @@ Use `--storage <name>` to use an alternate storage location instead of the defau
 │   └── {session-id}/
 │       └── metadata.json
 └── reports/
-    ├── session-reports/
-    │   ├── S1-report.md
-    │   ├── S2-report.md
-    │   └── ...
-    ├── pattern-reports/
-    │   ├── ami-confusion-consolidated.md
-    │   ├── google-docs-index-consolidated.md
-    │   └── ...
-    ├── recommendations-{timestamp}.md
-    ├── rest-{timestamp}.md
-    └── REST-ANALYSIS.epub
+    └── {project-slug}/
+        ├── 2025-12-31-14-30/           # Run timestamp (preserves history)
+        │   ├── session-reports/
+        │   │   ├── S1-report.md
+        │   │   └── S2-report.md
+        │   ├── pattern-reports/
+        │   │   ├── ami-confusion-consolidated.md
+        │   │   └── google-docs-index-consolidated.md
+        │   ├── recommendations.md
+        │   ├── rest.md
+        │   └── {project-slug}-REST-2025-12-31-14-30.epub
+        └── 2025-12-31-18-00/           # Another run (old run preserved!)
+            └── ...
 ```
 
 **Use cases:**

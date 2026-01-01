@@ -20,6 +20,7 @@ You will receive:
 - `session_id`: The main session ID
 - `session_serial`: The S number (e.g., "S7")
 - `storage_path`: Base path for analysis storage
+- `run_reports_dir`: Run-specific reports directory (e.g., `~/.claude/analysis/reports/project-slug/2025-12-31-14-30/`)
 - `intermediate_report`: Path to beefy-analyzer's intermediate report
 - `batch_reports`: List of paths to incremental batch reports
 
