@@ -482,6 +482,16 @@ For each plugin, versions live in TWO places:
 
 Users need to uninstall/reinstall to get updates. If the version doesn't change, they might think they have the latest when they don't. Version bumps are cheap - do them liberally.
 
+### Breaking Changes? Add Migrations!
+
+If your version introduces breaking changes (moved files, renamed configs, changed formats):
+
+1. Add entries to `plugins/{name}/MIGRATIONS.md`
+2. Create/update `plugins/{name}/commands/upgrade.md`
+3. Document in SLOP_REPORT that `/upgrade` is available
+
+See **[UPGRADE-PATTERN.md](UPGRADE-PATTERN.md)** for the full migration system guide.
+
 
 ---
 

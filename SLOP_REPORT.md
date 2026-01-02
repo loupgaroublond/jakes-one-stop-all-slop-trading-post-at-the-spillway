@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-01-02 — "THE MIGRATION UPDATE"
+
+Time to CLEAN HOUSE at the spillway! Deprecated paths are GONE! And now there's a COMMAND to help you UPGRADE!
+
+### claude-rest-system v2.4.0
+
+- **Ditched ~/.claude/self/** — sync.conf and archive.log now live at ~/.claude/ root. SIMPLER! CLEANER! LESS TYPING!
+- **MIGRATIONS.md** — Every breaking change documented in sequence for LLM-driven upgrades! It's like a CHANGELOG but for YOUR FILESYSTEM!
+- **/upgrade command** — Evaluates your system, tells you what needs migrating, DOES IT FOR YOU! It's non-deterministic SQL migrations but for Claude config! (That reference will make sense to approximately 3 people!)
+- **Fixed peers format in rest.md** — Examples now show the v2.2.0 {path, name} object format instead of the old string arrays
+- **Fixed agent count** — README now correctly says 9 agents instead of 7 (we can COUNT at the spillway!)
+- **Fixed subagent list in SETUP.md** — All 9 agents properly listed with their ACTUAL names
+
+
+---
+
 ## 2025-12-31 — "THE NO CLOBBER UPDATE"
 
 Your reports were getting CLOBBERED! Project A runs `/rest`, Project B runs `/rest`, and WHOOPS there goes Project A's analysis! NOT ANYMORE!

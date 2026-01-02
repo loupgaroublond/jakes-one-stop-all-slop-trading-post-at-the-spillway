@@ -16,7 +16,7 @@ Installation and configuration guide for the Claude Rest System plugin.
 The plugin automatically registers:
 - SessionStart hook (silently archives sessions)
 - Slash commands: `/yawn`, `/rest`, `/drilldown`, `/rewind`, `/peers`
-- Subagents: `rest-analyzer`, `recommendations-assembler`, `rewind-agent`, `test-analyzer`
+- Subagents: `session-classifier`, `inline-analyzer`, `meta-analyzer`, `beefy-analyzer`, `beefy-subagent-analyzer`, `beefy-reporter`, `rewind-analyzer`, `recommendations-assembler`, `test-analyzer`
 - Skills: `session-analysis`
 
 

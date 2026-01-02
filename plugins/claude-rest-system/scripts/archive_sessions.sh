@@ -8,8 +8,8 @@ set -euo pipefail
 CLAUDE_DIR="${HOME}/.claude"
 PROJECTS_DIR="${CLAUDE_DIR}/projects"
 ARCHIVE_DIR="${CLAUDE_DIR}/session-archives"
-LOG_FILE="${CLAUDE_DIR}/self/archive.log"
-SYNC_CONF="${CLAUDE_DIR}/self/sync.conf"
+LOG_FILE="${CLAUDE_DIR}/archive.log"
+SYNC_CONF="${CLAUDE_DIR}/sync.conf"
 
 # Load sync config (env vars override conf values)
 NETWORK_STORAGE_PATH="${NETWORK_STORAGE_PATH:-}"

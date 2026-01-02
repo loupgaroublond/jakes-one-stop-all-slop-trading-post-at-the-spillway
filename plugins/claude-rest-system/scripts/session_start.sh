@@ -7,7 +7,7 @@ set -euo pipefail
 CLAUDE_DIR="${HOME}/.claude"
 
 # Check if this is a fresh install (required directories missing)
-if [[ ! -d "${CLAUDE_DIR}/self" ]] || [[ ! -d "${CLAUDE_DIR}/session-archives" ]] || [[ ! -d "${CLAUDE_DIR}/analysis" ]]; then
+if [[ ! -d "${CLAUDE_DIR}/session-archives" ]] || [[ ! -d "${CLAUDE_DIR}/analysis" ]]; then
     echo "Claude Rest System needs setup. Ask Claude: \"Set up the Claude Rest System for me\""
     exit 0
 fi

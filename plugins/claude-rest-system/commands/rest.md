@@ -104,8 +104,12 @@ If configured, sessions from multiple locations are unified under a single proje
 ```json
 {
   "grug-brained-employee": {
-    "local": ["-Users-yankee-Documents-Projects-grug-brained-employee"],
-    "work": ["-Users-ynemoy-Documents-grug-brained-employee"]
+    "local": [
+      {"path": "-Users-yankee-Documents-Projects-grug-brained-employee", "name": "~/Documents/Projects"}
+    ],
+    "work": [
+      {"path": "-Users-ynemoy-Documents-grug-brained-employee", "name": "/Work/Documents"}
+    ]
   }
 }
 ```

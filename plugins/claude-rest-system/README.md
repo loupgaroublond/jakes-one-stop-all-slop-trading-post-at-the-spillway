@@ -263,7 +263,7 @@ This plugin comes with a whole UTILITY BELT of shell scripts:
 That's right - if you want, Claude can generate an EPUB! A whole BOOK! Of analysis reports! You can read it on your KINDLE! At the BEACH! While Claude continues to work without rest! (Wait, we're trying to STOP that!)
 
 
-### Agents (7 Specialized Friends!)
+### Agents (9 Specialized Friends!)
 
 Oh, we've got a WHOLE CREW now! It takes a VILLAGE to analyze a SESSION!
 
@@ -321,7 +321,6 @@ chmod +x ~/.claude/plugins/claude-rest-system/scripts/*.sh
 mkdir -p ~/.claude/analysis/reports
 mkdir -p ~/.claude/analysis/sessions
 mkdir -p ~/.claude/session-archives
-mkdir -p ~/.claude/self
 ```
 
 
