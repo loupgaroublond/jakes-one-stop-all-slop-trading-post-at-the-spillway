@@ -76,8 +76,10 @@ if $CLEAN; then
 fi
 
 # --- Helper: run command in VM ---
+# Subshell with cd /tmp prevents Lima from mirroring host CWD into the guest.
+# Without this, limactl tries to cd to the host path inside the VM and emits warnings.
 vm_shell() {
-  limactl shell "$VM_NAME" -- "$@"
+  (cd /tmp && limactl shell "$VM_NAME" -- "$@")
 }
 
 # --- Create VM if it doesn't exist ---
@@ -137,8 +139,21 @@ vm_shell bash -c '
   cp /fixtures/sessions/*.jsonl "$HOME_DIR/.claude/projects/-${ENCODED}/"
 '
 
-# Copy host settings.json (has enabledPlugins config)
-limactl copy "$HOME/.claude/settings.json" "${VM_NAME}:~/.claude/settings.json" 2>/dev/null || true
+# Generate minimal settings.json for the test (don't copy host's — it contains user-specific config)
+SETTINGS_TMP=$(mktemp /tmp/settings-XXXX.json)
+cat > "$SETTINGS_TMP" <<'SETTINGS_EOF'
+{
+  "permissions": {
+    "allow": [],
+    "deny": []
+  },
+  "enabledPlugins": {
+    "claude-rest-system@all-slop-marketplace": true
+  }
+}
+SETTINGS_EOF
+limactl copy "$SETTINGS_TMP" "${VM_NAME}:~/.claude/settings.json"
+rm -f "$SETTINGS_TMP"
 
 # Inject auth credentials into VM
 echo "=== Configuring auth ($AUTH_MODE) ==="

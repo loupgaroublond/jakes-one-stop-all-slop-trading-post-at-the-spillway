@@ -9,6 +9,8 @@ cpus: 2
 memory: "4GiB"
 disk: "20GiB"
 
+propagateProxyEnv: false
+
 mounts:
   - location: "REPO_ROOT_PLACEHOLDER"
     mountPoint: "/repo"
@@ -24,6 +26,6 @@ provision:
       set -eux
       # Node.js 22.x
       curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-      apt-get install -y nodejs jq git
+      apt-get install -y nodejs jq git pandoc
       # Claude Code
       npm install -g @anthropic-ai/claude-code
