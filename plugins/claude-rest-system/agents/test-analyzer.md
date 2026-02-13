@@ -47,26 +47,32 @@ ls ~/.claude/projects/*$PROJECT*/*.jsonl 2>/dev/null | head -20
 ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_prefilter.sh <directory>
 ```
 
-### 3. Analyze Each Session
+### 3. Generate Transcripts
 
-**Small sessions (< 100 messages):** Full read
+For each session, generate a readable transcript:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_inventory.sh <session_file>
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_transcript.sh <session_file> > /tmp/transcript-S<n>.md
 ```
 
-**Large sessions (100+ messages):** Keyword search first
+For large sessions (>1000 lines), chunk with overlapping ranges:
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "error|failed|exception"
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "I see|understood|learned"
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "no,|actually|wrong"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_transcript.sh <session_file> 1 600 > /tmp/transcript-S<n>-chunk-1.md
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_transcript.sh <session_file> 550 1150 > /tmp/transcript-S<n>-chunk-2.md
 ```
 
-Then extract regions of interest:
+### 4. Analyze from Transcript
+
+Read the transcript and identify findings directly from the conversation flow:
+- **Learnings**: Things Claude figured out worth documenting
+- **Mistakes**: Patterns where Claude repeatedly erred
+- **Walked-through processes**: Multi-step procedures the user taught the agent
+
+For findings needing raw data (error messages, tool output), extract from JSONL:
 ```bash
 ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start> <end>
 ```
 
-### 4. Apply session-analysis Skill
+### 5. Apply session-analysis Skill
 
 Use the skill's findings schema:
 ```json
@@ -83,7 +89,25 @@ Use the skill's findings schema:
 }
 ```
 
-### 5. Store Findings
+For walked-through processes:
+```json
+{
+  "id": "P1",
+  "type": "process",
+  "domain": "category",
+  "title": "Process title",
+  "what_happened": "User walked agent through N-step procedure: (1) step, (2) step...",
+  "why_it_matters": "General-purpose procedure, candidate for automation",
+  "outcome": "success|failure|partial",
+  "evidence_range": [start, end],
+  "step_count": 4,
+  "user_corrections": 1,
+  "multi_turn": true,
+  "drill_down_keywords": ["specific", "search", "terms"]
+}
+```
+
+### 6. Store Findings
 
 Write findings to test storage:
 ```bash
@@ -92,7 +116,7 @@ mkdir -p ~/.claude/analysis-test/sessions/<session_id>
 
 Write `~/.claude/analysis-test/sessions/<session_id>/quick-<timestamp>.json`
 
-### 6. Update Metadata
+### 7. Update Metadata
 
 ```json
 {
@@ -105,7 +129,7 @@ Write `~/.claude/analysis-test/sessions/<session_id>/quick-<timestamp>.json`
 }
 ```
 
-### 7. Generate Report
+### 8. Generate Report
 
 Follow the template at `${CLAUDE_PLUGIN_ROOT}/skills/session-analysis/report-template.md`.
 
@@ -123,6 +147,18 @@ Analyzed sessions S<n>-S<m>, <total> messages.
 
 *Keywords: <keyword1>, <keyword2>, <keyword3>*
 
+## Walked-Through Processes
+
+**<Process Title>** (S<n>)
+
+<Narrative of what happened and why.>
+
+**Steps extracted:**
+1. <Step description> [M#<line>]
+2. <Step description> [M#<line>]
+
+*Corrections: <count> | Keywords: <keyword1>, <keyword2>*
+
 ---
 
 *<count> findings across <count> domains: <domain1> (<count>), ...*
@@ -133,6 +169,29 @@ Analyzed sessions S<n>-S<m>, <total> messages.
 
 Save to `~/.claude/analysis-test/reports/rest-{YYYY-MM-DD}-{HH-MM}.md` (24-hour local time)
 
+## What to Look For
+
+### Learnings (Worth Documenting)
+- Discovered facts: API quirks, CLI flag behaviors, config file locations
+- Figured-out patterns: How systems connect, naming conventions
+- Successful techniques: Approaches that worked well
+- Navigation confusion: Agent used multiple Glob/Grep/Read across different paths before finding the target — document the file location as a learning (e.g., "service config lives at /path/to/config.yml")
+
+### Mistakes (Need Better Steering)
+- Repeated errors: Same mistake multiple times
+- Self-corrections: Initial wrong approach, even if caught quickly
+- Assumption failures: Claude assumed something incorrectly
+- Tool misuse: Wrong flags, incorrect syntax
+
+### Walked-Through Processes (Candidates for Automation)
+- User providing sequential steps for the agent to follow
+- Multi-turn instruction sequences (3+ directive user messages in a window)
+- User re-explaining steps after agent got them wrong
+- Procedures that appear general-purpose (not one-off project-specific)
+
+For each process: note step count, whether it was multi-turn, and how many
+user corrections were needed. Describe steps in the narrative.
+
 ## Key Rules
 
 - **Always use test storage**: `~/.claude/analysis-test/`
@@ -140,3 +199,4 @@ Save to `~/.claude/analysis-test/reports/rest-{YYYY-MM-DD}-{HH-MM}.md` (24-hour 
 - **Specific evidence**: Include actual values, field names, error messages
 - **Keywords in italics**: End each finding with `*Keywords: ...*` for drill-down
 - **Methodology section**: Always included - documents how analysis was performed
+- **Process metadata**: Process findings include step_count, user_corrections, multi_turn

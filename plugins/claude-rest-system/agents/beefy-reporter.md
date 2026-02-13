@@ -51,8 +51,8 @@ done
 ### 2. Collect All Findings
 
 Gather:
-- Main session findings from intermediate report
-- Batch findings from all incremental reports
+- Main session findings from intermediate report (learnings, mistakes, processes)
+- Batch findings from all incremental reports (learnings, mistakes, processes)
 - Context and connections noted
 
 ### 3. Unify Finding IDs
@@ -83,6 +83,7 @@ Look across all findings for:
 - **Related findings**: Batch findings that connect to main session
 - **Repeated patterns**: Same issue appearing across subagents
 - **Resolution chains**: Problem → investigation → solution across stages
+- **Repeated processes**: Same walked-through procedure in main + subagents
 
 ### 5. Structure Final Report
 
@@ -94,7 +95,8 @@ Look across all findings for:
   "summary": {
     "total_findings": 12,
     "learnings": 7,
-    "mistakes": 5,
+    "mistakes": 4,
+    "processes": 1,
     "subagents_analyzed": 15,
     "domains": ["kubernetes", "shell-scripting", "git"]
   },
@@ -150,7 +152,7 @@ cat > "{storage_path}/sessions/{session_id}/metadata.json" <<'EOF'
   "analyzed_through_message": {total_main_messages},
   "total_messages_at_analysis": {total_main_messages},
   "analysis_timestamp": "{ISO-8601}",
-  "analysis_version": "v2.0",
+  "analysis_version": "v3.0",
   "analyzer": "beefy-pipeline",
   "subagents_analyzed": {count},
   "batches_processed": {batch_count}
@@ -179,7 +181,8 @@ Return a JSON object:
   "summary": {
     "total_findings": 12,
     "learnings": 7,
-    "mistakes": 5,
+    "mistakes": 4,
+    "processes": 1,
     "subagents_analyzed": 15,
     "batches_processed": 3
   },

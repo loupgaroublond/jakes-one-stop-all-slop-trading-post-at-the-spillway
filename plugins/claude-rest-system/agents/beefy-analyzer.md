@@ -19,7 +19,8 @@ This pacing allows user control over token consumption.
 ## Input
 
 You will receive:
-- `session_file`: Path to the main JSONL session file
+- `transcript_file`: Path to pre-generated main session transcript (.md), OR `transcript_chunks`: List of chunk transcript paths for monster sessions
+- `session_file`: Path to the main JSONL session file (for targeted extraction)
 - `subagent_files`: List of ALL subagent file paths (>10 files)
 - `storage_path`: Base path for analysis storage
 - `run_reports_dir`: Run-specific reports directory (e.g., `~/.claude/analysis/reports/project-slug/2025-12-31-14-30/`)
@@ -27,18 +28,21 @@ You will receive:
 
 ## Your Scope
 
-**DO:** Analyze the main session file
+**DO:** Analyze the main session transcript
 **DO:** Inventory all subagents (count, types, sizes)
 **DO:** Produce intermediate report with main session findings
 **DO NOT:** Analyze subagent files (that's for beefy-subagent-analyzer)
 
 ## Process
 
-### 1. Inventory Main Session
+### 1. Read Main Session Transcript
 
-```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_inventory.sh "$session_file"
-```
+Read the pre-generated transcript file(s). The transcript contains the conversational
+skeleton of the session with M# references back to the raw JSONL.
+
+**For monster sessions receiving chunks:** Read all chunk transcripts sequentially.
+Note chunk boundaries. Look for processes spanning chunks (the overlap ensures at
+least one chunk captures the full process).
 
 ### 2. Inventory Subagents (Quick Summary Only)
 
@@ -53,16 +57,25 @@ done
 echo "Total subagents: ${#subagent_files[@]}"
 ```
 
-### 3. Analyze Main Session
+### 3. Identify Findings from Transcript
 
-Search for indicators in the main session only:
-- Error keywords: `error|failed|exception|timeout|denied`
-- User corrections: `"type":"human"` followed by corrections
-- Self-corrections: `actually|wait|sorry|let me|I was wrong`
-- Tool failures: `"error":` in tool results
-- Subagent spawning: When and why were subagents created?
+Reading the conversation flow in the transcript, identify:
+- **Learnings**: Things Claude figured out worth documenting
+- **Mistakes**: Patterns where Claude repeatedly erred
+- **Walked-through processes**: Multi-step procedures the user taught the agent
 
-### 4. Structure Intermediate Report
+The transcript gives you the full conversational context. You don't need
+keyword searches to find interesting regions — read and identify directly.
+
+### 4. Extract Raw Data When Needed
+
+For findings that need data stripped from the transcript (error messages,
+tool output, specific command syntax), extract from the raw JSONL:
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh "$session_file" <start> <end>
+```
+
+### 5. Structure Intermediate Report
 
 ```json
 {
@@ -75,6 +88,17 @@ Search for indicators in the main session only:
       "description": "Description of finding",
       "evidence_range": [start, end],
       "domain": "domain-name",
+      "drill_down_keywords": ["keyword1", "keyword2"]
+    },
+    {
+      "id": "T2",
+      "type": "process",
+      "description": "User walked agent through 3-step setup: (1) create config, (2) apply, (3) verify",
+      "evidence_range": [start, end],
+      "domain": "domain-name",
+      "step_count": 3,
+      "user_corrections": 0,
+      "multi_turn": true,
       "drill_down_keywords": ["keyword1", "keyword2"]
     }
   ],
@@ -90,12 +114,13 @@ Search for indicators in the main session only:
   "context_for_subagent_analysis": {
     "main_session_summary": "User was implementing X feature, encountered Y issues",
     "key_domains": ["kubernetes", "shell-scripting"],
-    "watch_for": ["path handling", "timeout issues"]
+    "watch_for": ["path handling", "timeout issues"],
+    "processes_started": ["If a walked-through process was initiated in main session, note here so batch analyzers check for continuation"]
   }
 }
 ```
 
-### 5. Write to Storage
+### 6. Write to Storage
 
 ```bash
 mkdir -p "{storage_path}/sessions/{session_id}/beefy"
@@ -138,6 +163,7 @@ Your `context_for_subagent_analysis` field is crucial. It helps subsequent analy
 2. **What domains appeared?** Categories of work (kubernetes, git, etc.)
 3. **What to watch for?** Patterns from main session that may recur in subagents
 4. **What subagents are high-priority?** Any that seem particularly relevant
+5. **Processes started?** If a walked-through process was initiated in main session, note it in `processes_started` so batch analyzers check for continuation
 
 ## Guidelines
 
@@ -145,6 +171,7 @@ Your `context_for_subagent_analysis` field is crucial. It helps subsequent analy
 - **Rich context**: Your intermediate report should set up subagent analysis well
 - **Finding IDs**: Start with T1, but note these may be renumbered by beefy-reporter
 - **Subagent spawning**: Note WHY subagents were created (visible in main session)
+- **Process metadata**: Process findings include step_count, user_corrections, multi_turn
 
 ## What to Look For
 
@@ -154,6 +181,16 @@ Your `context_for_subagent_analysis` field is crucial. It helps subsequent analy
 - Errors or issues in the main flow
 - User feedback and corrections
 - Domain patterns emerging
+- Navigation confusion: Agent searching across multiple paths — file locations worth documenting
+
+### Walked-Through Processes (Candidates for Automation)
+- User providing sequential steps for the agent to follow
+- Multi-turn instruction sequences (3+ directive user messages in a window)
+- User re-explaining steps after agent got them wrong
+- Procedures that appear general-purpose (not one-off project-specific)
+
+For each process: note step count, whether it was multi-turn, and how many
+user corrections were needed. Describe steps in the narrative.
 
 ### For Subagent Context
 - What was each subagent asked to do?

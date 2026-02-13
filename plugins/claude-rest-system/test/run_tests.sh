@@ -134,12 +134,12 @@ else
   ((FAIL++))
 fi
 
-# Check agents/rest-analyzer.md exists
-if [ -f agents/rest-analyzer.md ]; then
-  echo "✓ agents/rest-analyzer.md exists"
+# Check agents/inline-analyzer.md exists
+if [ -f agents/inline-analyzer.md ]; then
+  echo "✓ agents/inline-analyzer.md exists"
   ((PASS++))
 else
-  echo "✗ agents/rest-analyzer.md missing"
+  echo "✗ agents/inline-analyzer.md missing"
   ((FAIL++))
 fi
 

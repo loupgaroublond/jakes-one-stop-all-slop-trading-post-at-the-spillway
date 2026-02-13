@@ -30,13 +30,19 @@ You receive:
    - Use `/drilldown` patterns to examine specific incidents
    - Get enough context to specify exact file, section, and content
 
-5. **Make recommendations concrete**: Instead of "consider documenting X", write:
+5. **Generate process automation suggestions**: For each `process` finding:
+   - Read the extracted steps from the finding narrative
+   - Assess what form reuse could take: slash command, script, CLAUDE.md procedure, agent instruction
+   - Write a rough sketch showing how the steps could become reusable
+   - Frame as suggestion, not prescription — the user decides what to do
+
+6. **Make recommendations concrete**: Instead of "consider documenting X", write:
    - Exact file to modify
    - Exact section within that file
    - Specific content or pattern to add
    - Example if helpful
 
-6. **Deduplicate**: Merge related suggestions that address the same issue
+7. **Deduplicate**: Merge related suggestions that address the same issue
 
 ## Output Format
 
@@ -65,6 +71,20 @@ Return ONLY the Recommendations section in this format:
 2. Add retry logic with exponential backoff (3 attempts)
 3. (Addresses S53)
 
+### Walked-Through Process Automation
+
+**<Process title>** (from S<n>-T<m>)
+
+The user walked the agent through <brief description> across <step count> steps
+(<correction count> corrections needed).
+
+*Rough sketch for reuse:*
+- Could become a `/<command-name>` slash command
+- Key steps: <numbered summary>
+- Watch out for: <known pitfall from corrections>
+
+(Addresses S<n>-T<m>)
+
 ### Process Suggestions
 
 1. Run `/rest` weekly to catch patterns before they compound
@@ -78,3 +98,4 @@ Return ONLY the Recommendations section in this format:
 - **Traceable**: Always reference which sessions/findings each recommendation addresses
 - **Actionable**: Reader should be able to implement without further investigation
 - **Deduplicated**: One recommendation per issue, even if multiple findings relate to it
+- **Process findings generate rough implementation sketches** as suggestions — the user decides whether and how to act on them

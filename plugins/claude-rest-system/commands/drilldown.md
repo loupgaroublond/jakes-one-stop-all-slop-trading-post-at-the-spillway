@@ -150,6 +150,32 @@ cp: target 'Documents' is not a directory
 [Similar detailed breakdown...]
 ```
 
+**For process findings**, present the step-by-step walkthrough:
+
+```markdown
+## Drill-Down: S7 T5 - EKS Deployment Process
+
+**Steps:** 4 | **Corrections:** 1
+
+### Step 1: Create cluster config [M#122-135]
+> User: Create a YAML config with the node group specs...
+> Assistant: [creates config]
+
+### Step 2: Apply with eksctl [M#140-152]
+> User: Now apply it with eksctl create cluster
+> Assistant: [runs command]
+
+### Step 3: Verify nodes [M#155-165]
+> User: Check the nodes are up
+> Assistant: [runs kubectl get nodes]
+
+### Step 4: Update kubeconfig [M#170-185] ⚠️ Correction
+> User: Update the kubeconfig
+> Assistant: [uses wrong region]
+> User: No, use --region us-east-1
+> Assistant: [corrects and runs successfully]
+```
+
 ### 7. Store Drill-Down
 
 Save for potential further drill-down:

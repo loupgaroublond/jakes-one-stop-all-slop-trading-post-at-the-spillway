@@ -1,0 +1,29 @@
+vmType: vz
+arch: default
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+  - location: "https://cloud-images.ubuntu.com/releases/24.04/release/ubuntu-24.04-server-cloudimg-amd64.img"
+    arch: "x86_64"
+cpus: 2
+memory: "4GiB"
+disk: "20GiB"
+
+mounts:
+  - location: "REPO_ROOT_PLACEHOLDER"
+    mountPoint: "/repo"
+    writable: false
+  - location: "FIXTURES_DIR_PLACEHOLDER"
+    mountPoint: "/fixtures"
+    writable: false
+
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux
+      # Node.js 22.x
+      curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+      apt-get install -y nodejs jq git
+      # Claude Code
+      npm install -g @anthropic-ai/claude-code

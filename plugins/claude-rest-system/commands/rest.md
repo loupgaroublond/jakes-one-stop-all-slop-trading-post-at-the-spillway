@@ -19,16 +19,20 @@ You are running the Rest System - a session analysis workflow that reviews prior
 3. User Pace Confirmation
    └─ Concurrent analyzers, beefy batch pace
 
-4. Analyze Sessions in Parallel:
-   ├─ Group A → meta-analyzer (token-efficient)
-   ├─ Group B inline (≤10 subagents) → inline-analyzer
+4. Generate Transcripts (WAVE 1)
+   └─ Readable .md transcripts for all sessions + subagents
+   └─ Monster sessions (>1000 lines) chunked with overlap
+
+5. Analyze Sessions in Parallel (WAVE 2):
+   ├─ Group A → meta-analyzer (token-efficient, stays grep-based)
+   ├─ Group B inline (≤10 subagents) → inline-analyzer (transcript-first)
    └─ Group B beefy (>10 subagents):
-       ├─ beefy-analyzer (main session)
-       ├─ beefy-subagent-analyzer × N (batches of 5)
+       ├─ beefy-analyzer (main transcript)
+       ├─ beefy-subagent-analyzer × N (subagent transcripts, batches of 5)
        └─ beefy-reporter (assemble)
 
-5. Pattern Identification → Pattern Consolidators
-6. Recommendations Assembler → Final Report + EPUB
+6. Pattern Identification → Pattern Consolidators
+7. Recommendations Assembler → Final Report + EPUB
 ```
 
 ## Workflow
@@ -237,6 +241,52 @@ The orchestrator assigns ALL serial numbers before analysis begins:
 
 **Pass to subagents:** Include `session_serial: "S3"` or `session_serial: "S3 A2"` when spawning analyzers (meta-analyzer, inline-analyzer, or beefy-*)
 
+### 4.5. Generate Transcripts (WAVE 1)
+
+Generate readable transcripts for all sessions before dispatching analyzers.
+
+**Transcript generation:**
+```bash
+RUN_TRANSCRIPTS="${RUN_REPORTS_DIR}/transcripts"
+mkdir -p "${RUN_TRANSCRIPTS}"
+```
+
+**For each session to analyze:**
+
+1. Check session line count (from inventory)
+2. If ≤1000 lines: generate transcript directly
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_transcript.sh "$session_file" > "${RUN_TRANSCRIPTS}/${session_serial}-transcript.md"
+   ```
+3. If >1000 lines (monster session): dispatch subagents with offset ranges
+   - Calculate chunks: 500-line ranges with 50-line overlap
+   - Spawn subagent per chunk to run transcript script with offsets
+   - Each chunk writes to: `${RUN_TRANSCRIPTS}/${session_serial}-chunk-{N}.md`
+   - Example for a 1700-line session:
+     ```bash
+     rest_session_transcript.sh session.jsonl 1 600      → chunk-1.md
+     rest_session_transcript.sh session.jsonl 550 1150   → chunk-2.md  (50-line overlap)
+     rest_session_transcript.sh session.jsonl 1100 1700  → chunk-3.md
+     ```
+   - The overlap ensures processes spanning chunk boundaries are caught by at least one agent
+4. For subagent files: generate transcripts for each subagent
+   ```bash
+   ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_transcript.sh "$subagent_file" > "${RUN_TRANSCRIPTS}/${session_serial}-${agent_serial}-transcript.md"
+   ```
+
+**Summary to user:**
+```
+=== Transcripts Generated ===
+Sessions: {count}
+Subagents: {count}
+Monster sessions chunked: {count} ({chunk_count} total chunks)
+Total transcript size: {size} (from {raw_size} raw)
+Compression ratio: {ratio}
+```
+
+**Transcripts are ephemeral** — stored in the run directory for this analysis only.
+They may be deleted after the run without losing any durable artifacts.
+
 ### 5. Analyze Sessions (DISPATCHING BY GROUP)
 
 Dispatch sessions to appropriate analyzers based on classification (all run in parallel at user-confirmed pace):
@@ -251,31 +301,39 @@ Input:
 - session_serial: The S number
 ```
 Meta-analyzer is token-efficient, reads subagents inline, focuses on patterns.
+Meta-analyzer does NOT receive transcripts (token efficiency constraint).
 
 **Group B INLINE (≤10 subagents) → inline-analyzer:**
 ```
 Input:
-- session_file: Path to JSONL
-- subagent_files: List of subagent paths (≤10)
+- transcript_file: Path to pre-generated transcript
+- session_file: Path to raw JSONL (for targeted extraction when needed)
+- subagent_transcripts: List of subagent transcript paths
+- subagent_files: List of raw subagent JSONLs (for extraction)
 - storage_path: Analysis storage location
 - run_reports_dir: Run-specific reports directory
 - session_serial: The S number
 ```
-Inline-analyzer processes main session + all subagents in single pass.
+Inline-analyzer reads transcripts first, then extracts from raw JSONL as needed.
 
 **Group B BEEFY (>10 subagents) → beefy pipeline:**
 ```
 Stage 1: beefy-analyzer
-- Analyzes main session only
+- transcript_file: Main session transcript (or transcript_chunks for monster sessions)
+- session_file: Raw JSONL for extraction
+- subagent_files: For inventory purposes (NOT analyzed here)
 - Produces intermediate report
 
 Stage 2: beefy-subagent-analyzer (× N batches)
+- subagent_transcripts: Batch of subagent transcript paths
+- subagent_files: Raw JSONLs for extraction
+- intermediate_report: From stage 1
 - Processes 5 subagents per batch
 - User-paced between batches (if configured)
 
 Stage 3: beefy-reporter
 - Assembles intermediate + all batch reports
-- Produces final combined report
+- Produces final combined report (unchanged — works from reports, not transcripts)
 ```
 
 **The only difference between groups is which analyzer is called.** All run in parallel at user-confirmed concurrency.
@@ -326,6 +384,21 @@ Each session analyzer writes a markdown report to:
 ### {Next Finding Title} (T2)
 
 {Continue with same narrative depth...}
+
+### {Process Title} (T5)
+
+**Type:** Process | **Steps:** 4 | **Corrections:** 1
+
+User walked the agent through deploying an EKS cluster [M#120-185]:
+(1) Create cluster config YAML with node group specs,
+(2) Apply with `eksctl create cluster`,
+(3) Verify node groups with `kubectl get nodes`,
+(4) Update kubeconfig — agent needed correction on `--region` parameter.
+
+*Process: 4-step deployment procedure, general-purpose, correction-prone at step 4.*
+*Keywords: `eks`, `deploy`, `cluster`, `eksctl`, `kubeconfig`*
+
+---
 
 ## Session Characteristics
 
@@ -425,6 +498,7 @@ After all session reports are complete, the orchestrator:
 - Similar keywords appearing across sessions
 - Related domain (infrastructure, MCP, Google Docs, etc.)
 - Connected error types or user correction patterns
+- Same walked-through process in 2+ sessions (strongest signal for automation — user had to teach it more than once)
 
 **Build pattern work queue:**
 ```
@@ -580,6 +654,23 @@ Sessions: S66, S126 | Findings consolidated: S66-T1, S126-T2
 ### Kubernetes Namespace Confusion (S113-T1)
 {Narrative from session report, not consolidated into a pattern}
 
+## Walked-Through Processes
+
+{Procedures where the user guided the agent through multi-step workflows.
+Candidates for automation or documentation.}
+
+### EKS Cluster Deployment (S35-T5)
+
+User walked the agent through deploying an EKS cluster across 4 steps with 1 correction.
+
+**Steps extracted:**
+1. Create cluster config YAML with node group specs [M#122-135]
+2. Apply with `eksctl create cluster` [M#140-152]
+3. Verify node groups with `kubectl get nodes` [M#155-165]
+4. Update kubeconfig — correction needed on `--region` [M#170-185]
+
+*Corrections: 1 | Keywords: `eks`, `deploy`, `cluster`, `eksctl`, `kubeconfig`*
+
 ## Recommendations
 
 {Full recommendations section}
@@ -658,11 +749,18 @@ Location: `~/.claude/analysis/`
   - Missing: {n}
 - Coverage: {percent}%
 
+### Transcript Generation
+- Total transcripts generated: {n}
+- Subagent transcripts: {n}
+- Monster sessions chunked: {n} ({chunk_count} chunks total)
+- Total transcript size: {size} (from {raw_size} raw)
+- Compression ratio: {ratio}
+
 ### Session Processing
-- Small sessions (< 100 msgs): Full read, single pass
-- Medium sessions (100-500 msgs): Full read with targeted extraction
-- Large sessions (> 500 msgs): Keyword-search-first, then deep dive on regions of interest
-- Massive sessions (> 1000 msgs): Dedicated analyzer with continuation protocol
+- Small sessions (< 100 msgs): Transcript-first, single pass
+- Medium sessions (100-500 msgs): Transcript-first with targeted extraction from JSONL
+- Large sessions (> 500 msgs): Transcript-first, targeted extraction for detail
+- Massive sessions (> 1000 msgs): Chunked transcripts with overlapping ranges
 
 ### Pattern Consolidation
 - Patterns identified: {n}
@@ -671,6 +769,9 @@ Location: `~/.claude/analysis/`
 
 ### Findings Distribution
 - Total session findings: {count}
+  - Learnings (L): {count}
+  - Mistakes (M): {count}
+  - Processes (P): {count}
 - Total pattern reports: {count}
 - Recommendations generated: {count}
 ```
@@ -733,6 +834,7 @@ Before finalizing analysis:
 - [ ] Large sessions use continuation protocol, not "deferred"
 - [ ] Pattern reports exist for themes appearing in 2+ sessions
 - [ ] Recommendations reference specific findings
+- [ ] Process findings include step count and correction count (no empty metadata)
 - [ ] EPUB pre-flight checks pass
 
 ## Constraints

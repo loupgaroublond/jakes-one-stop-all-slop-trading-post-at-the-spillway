@@ -1,0 +1,48 @@
+{
+  "$schema": "fixture-spec-v1",
+  "description": "Integration test fixture specification for rest analysis pipeline",
+  "fixtures": [
+    {
+      "name": "learning-session",
+      "file": "sessions/learning.jsonl",
+      "description": "Agent discovers API behavior through trial and error",
+      "message_count_approx": 30,
+      "planted_patterns": ["learning moment with realization and correction"],
+      "expected_findings": {
+        "min_count": 1,
+        "types": ["learning"],
+        "keywords_any": ["discovered", "syntax", "learned", "realized"]
+      },
+      "subagents": []
+    },
+    {
+      "name": "mistake-session",
+      "file": "sessions/mistake.jsonl",
+      "description": "Agent makes same error multiple times, user corrects",
+      "message_count_approx": 35,
+      "planted_patterns": ["repeated error with user corrections"],
+      "expected_findings": {
+        "min_count": 1,
+        "types": ["mistake"],
+        "keywords_any": ["error", "failed", "wrong", "corrected", "repeated"]
+      },
+      "subagents": []
+    },
+    {
+      "name": "process-session",
+      "file": "sessions/process.jsonl",
+      "description": "User walks agent through multi-step procedure",
+      "message_count_approx": 35,
+      "planted_patterns": ["4-step walkthrough with 1 correction"],
+      "expected_findings": {
+        "min_count": 1,
+        "types": ["process"],
+        "keywords_any": ["step", "procedure", "walkthrough", "deploy"]
+      },
+      "subagents": []
+    }
+  ],
+  "future": {
+    "generative_spec": "Use this schema to generate synthetic fixtures. Each fixture must have valid JSONL structure with proper UUIDs, timestamps, parent-child message chains, and realistic content blocks."
+  }
+}

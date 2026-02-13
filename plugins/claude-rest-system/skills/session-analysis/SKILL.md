@@ -11,8 +11,11 @@ allowed-tools: Read, Grep, Glob, Bash
 Systematic analysis of Claude Code sessions to identify:
 - **Learnings**: Things Claude figured out that are worth documenting for future
 - **Mistakes**: Patterns where Claude repeatedly erred, indicating need for better steering
+- **Walked-Through Processes**: Multi-step procedures the user taught the agent, candidates for automation
 
 ## Analysis Process
+
+**Note:** When a pre-generated transcript is available (from the orchestrator's Wave 1), primary analysis is from reading the transcript directly. The grep-based keyword searches below serve as supplementary detection for targeted raw data extraction from the original JSONL.
 
 ### 1. Session Inventory
 
@@ -47,6 +50,17 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "no,|actuall
 ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "confused|unclear|not sure|don't understand"
 ```
 
+**Process indicators** - User walked agent through steps (supplementary to transcript reading):
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "step 1|first do|then do|follow these steps|here's the process"
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "now |next |okay now|go ahead and"
+```
+
+**Navigation confusion** - Agent searching for file locations (learning candidates):
+```bash
+${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_search.sh <session_file> "let me search|let me try|can't find|where is|trying to find"
+```
+
 ### 3. Extract Relevant Ranges
 
 When indicators are found, extract the surrounding context:
@@ -59,6 +73,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_extract.sh <session_file> <start_line
 For each significant incident, determine:
 - Is this a **learning** (worth documenting)?
 - Is this a **mistake** (needs better steering)?
+- Is this a **process** (user walked agent through reusable steps)?
 - What **domain** does it relate to? (shell-scripting, kubernetes, file-ops, etc.)
 - What **evidence range** [M#start-end] captures this?
 
@@ -126,6 +141,24 @@ For mistakes with multiple occurrences:
 }
 ```
 
+For walked-through processes:
+```json
+{
+  "id": "P1",
+  "type": "process",
+  "domain": "kubernetes",
+  "title": "EKS Cluster Deployment Procedure",
+  "what_happened": "User walked agent through 4-step EKS deployment: (1) create cluster config YAML with node group specs, (2) apply with `eksctl create cluster`, (3) verify node groups with `kubectl get nodes`, (4) update kubeconfig. Agent needed correction on `--region` parameter at step 4.",
+  "why_it_matters": "General-purpose deployment procedure. User had to teach it step by step, suggesting this could be automated or documented as a reusable workflow.",
+  "outcome": "success",
+  "evidence_range": [120, 185],
+  "step_count": 4,
+  "user_corrections": 1,
+  "multi_turn": true,
+  "drill_down_keywords": ["eks", "deploy", "cluster", "eksctl", "kubeconfig"]
+}
+```
+
 ### Required Fields
 
 - **domain**: Emergent category (shell-scripting, kubernetes, file-ops, json-yaml, git, etc.)
@@ -159,6 +192,7 @@ For mistakes with multiple occurrences:
   - `*Pattern:*` - For learnings: describe the reusable approach or technique discovered
   - `*Friction:*` - For mistakes/issues: explain the underlying UX or design problem
   - `*Mistake:*` - For repeated errors: note what guidance would prevent recurrence
+  - `*Process:*` - For walked-through processes: step count, correction count, whether general-purpose
   - `*Drill-down:*` - Always: comprehensive keywords for deeper investigation
 
 ### Report Format

@@ -166,6 +166,57 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/rest_session_prefilter.sh <dir>
 
 Returns JSON with session_id, message_count, first_timestamp, size_bytes.
 
+## Walked-Through Process Indicators
+
+Patterns suggesting the user walked the agent through a multi-step procedure.
+Used as supplementary grep when transcript analysis needs raw data confirmation.
+
+**Note:** These patterns are reference material for supplementary grep searches.
+Primary detection happens when the analysis agent reads the session transcript.
+
+### Single-message sequential instructions
+```bash
+"step 1|step 2|1\.|2\.|3\.|first,|second,|third,"
+"first do|then do|next do|after that|now do|once.*done"
+"follow these steps|here's the process|here's how|the procedure is"
+```
+
+### Multi-turn instruction sequences
+```bash
+"now |next |then |okay now|go ahead and"
+"run |execute |create |set up|configure |install |deploy "
+"check |verify |confirm |make sure|does it show"
+```
+
+### Process correction/re-explanation
+```bash
+"no, the order is|you need to.*first|let me walk you through|the steps are"
+```
+
+## Navigation Confusion Indicators
+
+Patterns suggesting the agent doesn't know where something is in the project.
+These are learning candidates: the resolution is documenting "you find X here."
+
+### Search-heavy sequences (visible as rapid tool_use in transcripts)
+```bash
+"let me search|let me try|let me check|let me look|looking for"
+"that wasn't it|not there|try another|different path|wrong location|wrong file"
+"where is|can't find|trying to locate|trying to find"
+```
+
+### Multiple file reads in quick succession
+```bash
+# In transcripts, look for 3+ consecutive → Used lines with
+# Glob, Grep, or Read targeting different directories
+"→ Used Glob|→ Used Grep|→ Used Read"
+```
+
+### Resolution indicators (the learning)
+```bash
+"found it|there it is|that's the one|located at|the config is at"
+```
+
 ## Usage Tips
 
 1. **Start broad, then narrow**: Begin with general error patterns, then drill into specific domains

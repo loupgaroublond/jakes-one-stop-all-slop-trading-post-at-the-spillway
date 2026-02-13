@@ -75,7 +75,15 @@ grep -hE "(error|failed|couldn't|unable)" "$session_file" "${subagent_files[@]}"
 
 # Any meta-improvements proposed?
 grep -h "meta_improvement" "$session_file" "${subagent_files[@]}"
+
+# Were walked-through processes extracted?
+grep -hE "(process|walkthrough|steps extracted|procedure)" "$session_file" "${subagent_files[@]}" | head -10
+
+# Navigation confusion? (agents searching for file locations)
+grep -hE "(can't find|let me search|trying to find|where is)" "$session_file" "${subagent_files[@]}" | head -10
 ```
+
+**Note:** Meta-analyzer does NOT get transcripts (token efficiency constraint). It continues to work from the raw JSONL with grep searches. The transcript approach is for regular analysis agents.
 
 ### 4. Non-Analysis Subagent Review
 
@@ -96,6 +104,7 @@ From your searches, identify:
 - **Systemic issues**: Problems that showed up multiple times across findings
 - **Analysis friction**: Where did the analysis process itself struggle?
 - **Meta-improvements**: Suggestions for improving the rest system
+- **Recurring walked-through processes**: Same procedure taught across multiple analyzed sessions
 
 ### 6. Structure Meta-Findings
 

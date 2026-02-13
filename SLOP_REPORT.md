@@ -6,6 +6,26 @@
 
 ---
 
+## 2026-02-12 — "THE TRANSCRIPT UPDATE"
+
+Sessions are like ONIONS — layers upon layers of JSON noise hiding the GOOD STUFF! So we built a PEELER!
+
+### claude-rest-system v3.0.0
+
+The BIGGEST architectural change since v2.0! We're talking TWO WAVES of analysis now!
+
+- **Transcript-first analysis** — New two-wave architecture: Wave 1 generates readable transcripts, Wave 2 analyzes them. Agents read conversations, not JSON soup!
+- **`rest_session_transcript.sh`** — New preprocessing script strips sessions to their conversational skeleton (1-5% of raw file size). M# line numbers preserved for back-reference!
+- **Monster session chunking** — Sessions >1000 lines get chunked with 50-line overlap. No session is too BEEFY to analyze!
+- **New `process` finding type** — Walked-through procedures where the user taught the agent step-by-step. These are AUTOMATION CANDIDATES!
+- **Walked-Through Processes section** — Reports now include extracted processes with step counts, correction counts, and keywords
+- **Process automation suggestions** — Recommendations assembler generates rough implementation sketches for reusable processes
+- **All 5 analysis agents updated** — inline-analyzer, beefy-analyzer, beefy-subagent-analyzer, test-analyzer (transcript-first), meta-analyzer (process-aware grep)
+- **Updated drilldown** — Process findings get step-by-step walkthrough presentation
+
+
+---
+
 ## 2026-01-02 — "THE MIGRATION UPDATE"
 
 Time to CLEAN HOUSE at the spillway! Deprecated paths are GONE! And now there's a COMMAND to help you UPGRADE!
