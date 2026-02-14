@@ -6,6 +6,22 @@
 
 ---
 
+## 2026-02-13 — "THE BOOK DOCTOR UPDATE"
+
+Your EPUB was BROKEN and nobody told you! Well, actually Books.app told you — with a LOVELY error about mismatched tags on line 202. So we fixed FIVE bugs at once!
+
+### claude-rest-system v3.0.1
+
+- **Fixed XHTML parsing errors** — `<placeholder>` tags in session content no longer nuke the entire EPUB. Pandoc now escapes all angle brackets via `--from markdown-raw_html`
+- **Fixed heading hierarchy** — H1 headings in rest.md now properly demote to H2, so pattern sections nest under Part I instead of breaking out as rogue chapters
+- **Fixed session sort order** — S1, S2, S9, S10, S100 instead of S1, S10, S100, S109, S11 (version sort, what a concept!)
+- **Fixed INDEX/SUMMARY inclusion** — Non-session markdown files in session-reports/ no longer sneak in as fake sessions
+- **Pattern dedup** — If rest.md already contains full pattern content, Part III is skipped to avoid duplicating 1700 lines
+- **Test suite** — New `test_epub_builder.sh` with fixtures from the mega analysis, 7 assertions including xmllint XHTML validation
+
+
+---
+
 ## 2026-02-12 — "THE TRANSCRIPT UPDATE"
 
 Sessions are like ONIONS — layers upon layers of JSON noise hiding the GOOD STUFF! So we built a PEELER!

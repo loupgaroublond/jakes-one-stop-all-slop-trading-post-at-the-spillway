@@ -84,7 +84,7 @@ fi
 # Check 3: Pattern reports
 PATTERN_REPORTS=""
 if [[ -d "pattern-reports" ]]; then
-    PATTERN_REPORTS=$(find pattern-reports -name "*.md" -type f 2>/dev/null | sort)
+    PATTERN_REPORTS=$(find pattern-reports -name "*-consolidated.md" -type f 2>/dev/null | sort -V)
 fi
 if [[ -z "$PATTERN_REPORTS" ]]; then
     WARNINGS="$WARNINGS\n[WARN] No pattern reports found in pattern-reports/"
@@ -96,7 +96,7 @@ fi
 # Check 4: Session reports
 SESSION_REPORTS=""
 if [[ -d "session-reports" ]]; then
-    SESSION_REPORTS=$(find session-reports -name "*.md" -type f 2>/dev/null | sort)
+    SESSION_REPORTS=$(find session-reports -name "S*-report.md" -type f 2>/dev/null | sort -V)
 fi
 if [[ -z "$SESSION_REPORTS" ]]; then
     WARNINGS="$WARNINGS\n[WARN] No session reports found in session-reports/"
@@ -185,7 +185,8 @@ if [[ -n "$FINAL_REPORT" ]]; then
     echo "## Analysis: $DATE_RANGE" >> "${COMBINED_MD}"
     echo "" >> "${COMBINED_MD}"
     # Skip the first H1 heading, demote remaining headings so they don't clutter TOC
-    sed '1{/^# /d;}' "$FINAL_REPORT" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> "${COMBINED_MD}"
+    # Order: deepest first to avoid double-demotion
+    sed '1{/^# /d;}' "$FINAL_REPORT" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
 fi
 
 # === PART 2: RECOMMENDATIONS ===
@@ -196,10 +197,16 @@ if [[ -n "$RECOMMENDATIONS" ]]; then
     echo "## Recommendations" >> "${COMBINED_MD}"
     echo "" >> "${COMBINED_MD}"
     # Demote headings so internal sections don't appear in TOC
-    sed '1{/^# /d;}' "$RECOMMENDATIONS" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> "${COMBINED_MD}"
+    sed '1{/^# /d;}' "$RECOMMENDATIONS" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
 fi
 
 # === PART 3: PATTERN REPORTS ===
+# Skip if rest.md already embeds full pattern content (avoids duplication)
+PATTERNS_IN_REST=$(grep -c '^# Pattern:' "$FINAL_REPORT" 2>/dev/null || echo 0)
+if [[ "$PATTERNS_IN_REST" -gt 0 ]]; then
+    echo "  [DEDUP] rest.md contains $PATTERNS_IN_REST embedded pattern sections — skipping Part III"
+    PATTERN_REPORTS=""
+fi
 if [[ -n "$PATTERN_REPORTS" ]]; then
     echo "" >> "${COMBINED_MD}"
     echo "# Part III: Cross-Session Patterns" >> "${COMBINED_MD}"
@@ -217,7 +224,7 @@ if [[ -n "$PATTERN_REPORTS" ]]; then
         echo "## Pattern: $chapter_title" >> "${COMBINED_MD}"
         echo "" >> "${COMBINED_MD}"
         # Demote headings so internal sections don't appear in TOC
-        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> "${COMBINED_MD}"
+        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
 
     done <<< "$PATTERN_REPORTS"
 fi
@@ -240,7 +247,7 @@ if [[ -n "$SESSION_REPORTS" ]]; then
         echo "## Session $session_num" >> "${COMBINED_MD}"
         echo "" >> "${COMBINED_MD}"
         # Demote headings so internal sections (Summary, Findings, Methodology) don't appear in TOC
-        sed '1{/^# /d;}' "$file" | sed 's/^#### /##### /g; s/^### /#### /g; s/^## /### /g' >> "${COMBINED_MD}"
+        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
 
     done <<< "$SESSION_REPORTS"
 fi
@@ -272,6 +279,7 @@ BOOK_TITLE="$PROJECT_DISPLAY - Rest Analysis - $DATE_RANGE"
 
 pandoc "${COMBINED_MD}" \
     -o "${EPUB_FILE}" \
+    --from markdown-raw_html \
     --metadata title="$BOOK_TITLE" \
     --metadata author="Claude Code Rest System" \
     --toc \
