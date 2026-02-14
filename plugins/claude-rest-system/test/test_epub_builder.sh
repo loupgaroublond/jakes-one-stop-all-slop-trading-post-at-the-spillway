@@ -131,6 +131,20 @@ else
     echo "  [SKIP] xmllint not available"
 fi
 
+# === TEST 9: List spacing — no smooshed lists ===
+echo "--- Test: List spacing ---"
+# Check that no line ending in text is immediately followed by a list item
+# (which would cause Pandoc to smoosh them into one paragraph)
+SMOOSHED=$(awk '
+    /^[[:space:]]*([-*] |[0-9]+\. )/ && prev != "" && prev !~ /^[[:space:]]*([-*] |[0-9]+\. )/ && prev !~ /^[[:space:]]*$/ {
+        count++
+    }
+    { prev = $0 }
+    END { print count+0 }
+' "$COMBINED_MD")
+echo "  Smooshed list transitions: $SMOOSHED"
+assert "No smooshed list items (text→list without blank line)" "$([ "$SMOOSHED" -eq 0 ] && echo 0 || echo 1)"
+
 # === SUMMARY ===
 echo ""
 echo "=== Results: $PASS/$TESTS passed, $FAIL failed ==="

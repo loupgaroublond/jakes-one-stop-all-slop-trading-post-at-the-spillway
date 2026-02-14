@@ -19,6 +19,19 @@
 
 set -euo pipefail
 
+# Ensure blank line before list items when one is missing.
+# Pandoc requires a blank line before lists to parse them as lists.
+fix_list_spacing() {
+    awk '{
+        is_list = ($0 ~ /^[[:space:]]*([-*] |[0-9]+\. )/)
+        is_blank = ($0 ~ /^[[:space:]]*$/)
+        if (is_list && !prev_blank && !prev_list) print ""
+        print
+        prev_blank = is_blank
+        prev_list = is_list
+    }'
+}
+
 STORAGE="${1:-}"
 PROJECT_SLUG="${2:-}"
 RUN_TIMESTAMP="${3:-}"
@@ -156,6 +169,7 @@ cat > "${COMBINED_MD}" << EOF
 ## Contents
 
 This book contains:
+
 EOF
 
 # Add content summary
@@ -186,7 +200,7 @@ if [[ -n "$FINAL_REPORT" ]]; then
     echo "" >> "${COMBINED_MD}"
     # Skip the first H1 heading, demote remaining headings so they don't clutter TOC
     # Order: deepest first to avoid double-demotion
-    sed '1{/^# /d;}' "$FINAL_REPORT" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
+    sed '1{/^# /d;}' "$FINAL_REPORT" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' | fix_list_spacing >> "${COMBINED_MD}"
 fi
 
 # === PART 2: RECOMMENDATIONS ===
@@ -197,7 +211,7 @@ if [[ -n "$RECOMMENDATIONS" ]]; then
     echo "## Recommendations" >> "${COMBINED_MD}"
     echo "" >> "${COMBINED_MD}"
     # Demote headings so internal sections don't appear in TOC
-    sed '1{/^# /d;}' "$RECOMMENDATIONS" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
+    sed '1{/^# /d;}' "$RECOMMENDATIONS" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' | fix_list_spacing >> "${COMBINED_MD}"
 fi
 
 # === PART 3: PATTERN REPORTS ===
@@ -224,7 +238,7 @@ if [[ -n "$PATTERN_REPORTS" ]]; then
         echo "## Pattern: $chapter_title" >> "${COMBINED_MD}"
         echo "" >> "${COMBINED_MD}"
         # Demote headings so internal sections don't appear in TOC
-        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
+        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' | fix_list_spacing >> "${COMBINED_MD}"
 
     done <<< "$PATTERN_REPORTS"
 fi
@@ -247,7 +261,7 @@ if [[ -n "$SESSION_REPORTS" ]]; then
         echo "## Session $session_num" >> "${COMBINED_MD}"
         echo "" >> "${COMBINED_MD}"
         # Demote headings so internal sections (Summary, Findings, Methodology) don't appear in TOC
-        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' >> "${COMBINED_MD}"
+        sed '1{/^# /d;}' "$file" | sed 's/^##### /####### /g; s/^#### /##### /g; s/^### /#### /g; s/^## /### /g; s/^# /## /g' | fix_list_spacing >> "${COMBINED_MD}"
 
     done <<< "$SESSION_REPORTS"
 fi

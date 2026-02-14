@@ -10,6 +10,11 @@
 
 Your EPUB was BROKEN and nobody told you! Well, actually Books.app told you — with a LOVELY error about mismatched tags on line 202. So we fixed FIVE bugs at once!
 
+### claude-rest-system v3.0.2
+
+- **Fixed smooshed lists in EPUB** — LLM-generated markdown like `**Key findings:**\n- item` (no blank line before the list) caused Pandoc to render everything as one chonky paragraph. New `fix_list_spacing()` awk filter ensures blank lines before all list items at all 4 content insertion points
+- **Test coverage** — Added list spacing assertion (Test 9) to `test_epub_builder.sh`
+
 ### claude-rest-system v3.0.1
 
 - **Fixed XHTML parsing errors** — `<placeholder>` tags in session content no longer nuke the entire EPUB. Pandoc now escapes all angle brackets via `--from markdown-raw_html`
