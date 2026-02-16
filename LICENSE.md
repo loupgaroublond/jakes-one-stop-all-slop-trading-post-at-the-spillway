@@ -349,4 +349,4 @@ successors are Excluded Parties under this license:
 ---
 
 *Jake's No Nonsense, No Nazi License v1.0*
-*An emission of Jake's One-Stop All-Slop Trading Post at the Spillway*
+*A byproduct of Jake's One-Stop All-Slop Trading Post at the Spillway*
