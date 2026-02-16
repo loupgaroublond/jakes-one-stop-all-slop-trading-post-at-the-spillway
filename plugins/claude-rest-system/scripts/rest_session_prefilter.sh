@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Pre-filter and inventory session files
 # Usage: rest_session_prefilter.sh <session_dir_or_file> [session_dir_or_file...]
 # Output: JSON array of valid sessions with id, count, first_timestamp, size_bytes

@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: test-analyzer
 description: Self-contained session analysis for testing. Invoke with minimal prompt like "analyze sessions S1-S3" or "scan .claude project". Uses test storage automatically.

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Analyze session files and update metadata (STUB VERSION)
 # This is a placeholder - actual analysis logic will be implemented in v2.0
 

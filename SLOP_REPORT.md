@@ -6,6 +6,32 @@
 
 ---
 
+## 2026-02-16 — "THE PAPERS, PLEASE UPDATE"
+
+Turns out every manifest in the whole marketplace was claiming MIT when the ACTUAL license is Jake's No Nonsense, No Nazi License. That's like putting a Honda badge on a TANK. Fixed that, and stamped SPDX headers on every source file so there's no confusion about whose slop this is.
+
+### claude-rest-system v3.0.3
+- Fixed license field from MIT to LicenseRef-JNNNL-1.0 in plugin.json and marketplace.json
+- Added `Copyright (c) 2026 Yaakov M Nemoy / SPDX-License-Identifier: LicenseRef-JNNNL-1.0` headers to all 19 shell scripts, 6 commands, 9 agents, 3 skill files
+
+### claude-autosurgeon v0.2.1
+- Fixed license field from MIT to LicenseRef-JNNNL-1.0 in plugin.json and marketplace.json
+- Added SPDX license headers to update-docs.sh and SKILL.md (cached Anthropic docs under docs/en/ excluded — not our copyright)
+
+### git-wizardry v2.0.1
+- Fixed license field from MIT to LicenseRef-JNNNL-1.0 in plugin.json and marketplace.json
+- Added SPDX license headers to 2 commands, 1 agent
+
+### productivity-pack v2.0.1
+- Fixed license field from MIT to LicenseRef-JNNNL-1.0 in plugin.json and marketplace.json
+- Added SPDX license headers to 4 commands
+
+### marketplace-wide
+- All 12 plugin entries in marketplace.json updated from MIT to LicenseRef-JNNNL-1.0
+- SPDX headers added to .beads/config.yaml and test/integration/vm.yaml
+
+---
+
 ## 2026-02-13 — "THE BOOK DOCTOR UPDATE"
 
 Your EPUB was BROKEN and nobody told you! Well, actually Books.app told you — with a LOVELY error about mismatched tags on line 202. So we fixed FIVE bugs at once!

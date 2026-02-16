@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Filter messages by type
 # Usage: rest_session_filter.sh <session_file> <type>
 # Types: user, assistant, summary, file-history-snapshot, queue-operation

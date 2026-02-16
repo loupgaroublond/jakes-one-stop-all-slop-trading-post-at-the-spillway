@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: beefy-reporter
 description: Final stage of beefy pipeline. Assembles intermediate and incremental reports into a cohesive final report.

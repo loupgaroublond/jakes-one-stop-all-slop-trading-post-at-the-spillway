@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: inline-analyzer
 description: Analyzes Group B sessions with ≤10 subagents. Processes main session and all subagents together in a single analysis pass.

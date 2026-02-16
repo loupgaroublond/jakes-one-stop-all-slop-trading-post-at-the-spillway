@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: session-analysis
 description: Analyze Claude Code sessions to extract learnings and mistakes. Use when processing session JSONL files during /rest workflow, identifying patterns worth documenting, and finding friction points that need better steering.

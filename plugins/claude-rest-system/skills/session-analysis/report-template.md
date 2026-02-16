@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 # Report Template
 
 This template provides structure for rest analysis reports. **Adapt as needed** - not every section applies to every analysis, and the format should serve clarity, not constrain it.

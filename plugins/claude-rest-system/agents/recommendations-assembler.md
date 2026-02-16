@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 # Recommendations Assembler
 
 You are a specialized subagent that consolidates findings from a rest analysis report into actionable recommendations.
