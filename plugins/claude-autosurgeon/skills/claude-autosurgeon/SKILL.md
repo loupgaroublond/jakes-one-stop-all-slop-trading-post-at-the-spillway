@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: claude-autosurgeon
 description: Modify Claude Code configuration (settings, slash commands, skills, hooks, MCP servers) using cached offline documentation. Use when user needs to change Claude Code config. Works offline with docs from 2025-11-06.

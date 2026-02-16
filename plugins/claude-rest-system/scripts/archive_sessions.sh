@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Archive session files from ~/.claude/projects/ to ~/.claude/session-archives/
 # Optionally sync to network storage for multi-machine analysis
 # Incrementally copies new and updated files, never deletes from archive

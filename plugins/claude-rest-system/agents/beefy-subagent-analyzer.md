@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: beefy-subagent-analyzer
 description: Analyzes batches of up to 5 subagent files for the beefy pipeline. Receives context from beefy-analyzer's intermediate report.

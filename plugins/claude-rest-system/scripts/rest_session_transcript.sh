@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Generate readable markdown transcript from raw JSONL session file
 # Usage: rest_session_transcript.sh <session_file> [start_line] [end_line]
 #

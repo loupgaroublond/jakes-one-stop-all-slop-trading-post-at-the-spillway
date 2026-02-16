@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Integration test for rest analysis pipeline
 # Runs /rest analysis inside a Lima VM against fixture sessions
 #

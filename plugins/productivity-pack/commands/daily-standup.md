@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 description: Account for your existence to an uncaring universe
 ---

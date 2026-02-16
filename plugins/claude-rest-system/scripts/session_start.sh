@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Session start hook - silently archives sessions
 # Fatigue reporting moved to /fatigue command
 

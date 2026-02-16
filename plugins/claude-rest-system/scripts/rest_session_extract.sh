@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Extract specific message range by line offset
 # Usage: rest_session_extract.sh <session_file> <start_line> <end_line>
 # Output: Lines from start to end (inclusive, 1-indexed)

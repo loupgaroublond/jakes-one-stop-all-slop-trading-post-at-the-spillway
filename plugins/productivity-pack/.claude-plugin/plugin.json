@@ -1,7 +1,7 @@
 {
   "name": "productivity-pack",
   "displayName": "Productivity Pack",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Essential productivity commands for time tracking, note-taking, and task management",
   "author": {
     "name": "All-Slop Marketplace",
@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway/tree/main/plugins/productivity-pack",
   "repository": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
-  "license": "MIT",
+  "license": "LicenseRef-JNNNL-1.0",
   "keywords": ["productivity", "tasks", "notes", "time-tracking"],
   "engines": {
     "claudeCode": ">=1.0.0"

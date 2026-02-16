@@ -1,6 +1,6 @@
 {
   "name": "claude-rest-system",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Look at Claude go! Working 24/7, never sleeping! But you know what they say - even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
   "author": {
     "name": "Jake's All-Slop Trading Post",
@@ -8,7 +8,7 @@
   },
   "homepage": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
   "repository": "https://github.com/loupgaroublond/jakes-one-stop-all-slop-trading-post-at-the-spillway",
-  "license": "MIT",
+  "license": "LicenseRef-JNNNL-1.0",
   "keywords": ["session-analysis", "fatigue-management", "self-improvement", "reflection", "rest"],
   "hooks": "./hooks/hooks.json"
 }

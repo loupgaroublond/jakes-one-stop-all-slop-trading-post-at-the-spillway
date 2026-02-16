@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 description: Record the passage of time, as if time could be owned
 ---

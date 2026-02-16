@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: beefy-analyzer
 description: Analyzes the main session only for Group B sessions with >10 subagents. Produces intermediate report for the beefy pipeline.

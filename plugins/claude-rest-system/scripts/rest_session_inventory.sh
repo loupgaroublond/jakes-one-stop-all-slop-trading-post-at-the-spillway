@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Generate compact inventory of session messages with line numbers and previews
 # Usage: rest_session_inventory.sh <session_file>
 # Output: line_number  type  "preview..."

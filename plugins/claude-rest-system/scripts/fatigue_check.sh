@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Calculate and report fatigue level based on unseen session messages
 # Scans all session files and compares to analysis metadata
 # Writes JSON inventory to ~/.claude/analysis/fatigue_inventory.json

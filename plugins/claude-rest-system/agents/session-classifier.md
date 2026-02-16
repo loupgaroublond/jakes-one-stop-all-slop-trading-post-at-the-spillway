@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: session-classifier
 description: Classifies sessions into Group A (rest-analysis) or Group B (regular work) for routing to appropriate analyzers. Fast classification using haiku.

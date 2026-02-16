@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: meta-analyzer
 description: Token-efficient analyzer for Group A (rest-analysis) sessions. Analyzes sessions that were themselves analyzing other sessions. Focus on patterns, not individual findings.

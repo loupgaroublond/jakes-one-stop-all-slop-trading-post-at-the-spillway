@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 description: A sage who has gazed too long into the directed acyclic graph
 allowed-tools: [Bash, Read, Write, Edit, Glob, Grep]

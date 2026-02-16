@@ -1,3 +1,5 @@
+<!-- Copyright (c) 2026 Yaakov M Nemoy -->
+<!-- SPDX-License-Identifier: LicenseRef-JNNNL-1.0 -->
 ---
 name: rewind-analyzer
 description: Open-ended session query agent. Extracts specific details from pre-compaction session history. More flexible than structured rest analysis.

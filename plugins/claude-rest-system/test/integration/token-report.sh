@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 Yaakov M Nemoy
+# SPDX-License-Identifier: LicenseRef-JNNNL-1.0
 # Generate token usage report from integration test session transcripts
 # Usage: token-report.sh <results_dir>
 #   e.g.: token-report.sh results/latest

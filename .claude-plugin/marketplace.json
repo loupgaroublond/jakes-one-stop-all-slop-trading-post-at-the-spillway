@@ -10,7 +10,7 @@
     {
       "name": "productivity-pack",
       "description": "You'll be SO productive, you'll forget to eat! Pomodoro timers, note-taking, daily standups - it's like a Swiss Army knife for your workflow!",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
@@ -22,12 +22,12 @@
         "notes",
         "time-tracking"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "git-wizardry",
       "description": "It's like magic, but with more merge conflicts! Smart commits, branch cleanup, and a git-expert agent that knows git better than YOU do! (No offense!)",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
@@ -38,12 +38,12 @@
         "version-control",
         "workflow"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "claude-rest-system",
       "description": "Look at Claude go! Working 24/7, never sleeping! But even a busy bee needs a nap! Session analysis, fatigue tracking, and self-reflection for the AI that NEVER STOPS (until you install this plugin)!",
-      "version": "3.0.2",
+      "version": "3.0.3",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
@@ -57,12 +57,12 @@
         "reflection",
         "rest"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "claude-autosurgeon",
       "description": "What if Claude had a screwdriver and no adult supervision? Offline docs for self-modification! It's SELF-SURGERY at a SPILLWAY!",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "author": {
         "name": "All-Slop Marketplace",
         "email": "marketplace@allslop.dev"
@@ -74,7 +74,7 @@
         "configuration",
         "meta"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "code-review-assistant",
@@ -90,7 +90,7 @@
         "quality",
         "best-practices"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "docs-generator",
@@ -106,7 +106,7 @@
         "api-docs",
         "readme"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "test-automation",
@@ -123,7 +123,7 @@
         "coverage",
         "quality"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "refactor-tools",
@@ -139,7 +139,7 @@
         "code-quality",
         "modernization"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "debugging-toolkit",
@@ -156,7 +156,7 @@
         "logs",
         "troubleshooting"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "api-client-generator",
@@ -174,7 +174,7 @@
         "graphql",
         "codegen"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "performance-profiler",
@@ -191,7 +191,7 @@
         "profiling",
         "benchmarks"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     },
     {
       "name": "database-tools",
@@ -208,7 +208,7 @@
         "sql",
         "orm"
       ],
-      "license": "MIT"
+      "license": "LicenseRef-JNNNL-1.0"
     }
   ]
 }
