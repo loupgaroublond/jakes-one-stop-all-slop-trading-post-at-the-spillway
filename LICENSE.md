@@ -1,6 +1,6 @@
 # Jake's No Nonsense, No Nazi License (JNNNL)
 
-### Version 1.1
+### Version 1.0
 
 > *Listen, I know what you're thinking — "Jake, why does a slop license need to
 > be this SPECIFIC?" And the answer is because some people are TERRIBLE and they
@@ -348,5 +348,5 @@ successors are Excluded Parties under this license:
 
 ---
 
-*Jake's No Nonsense, No Nazi License v1.1*
-*A product of Jake's One-Stop All-Slop Trading Post at the Spillway*
+*Jake's No Nonsense, No Nazi License v1.0*
+*An emission of Jake's One-Stop All-Slop Trading Post at the Spillway*
