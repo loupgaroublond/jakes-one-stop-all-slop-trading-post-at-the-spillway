@@ -6,6 +6,25 @@
 
 ---
 
+## 2026-04-09 — "THE SHIT DROPS"
+
+It's HERE! The plugin with the command prefix that makes your coworkers do a double-take at your terminal! Spec-Harness Implementation Trail lands at the spillway and it is AMBITIOUS, OPINIONATED, and AGGRESSIVELY NAMED!
+
+### spec-harness-implementation-trail v0.1.0
+
+- **Initial release!** Spec-driven development framework arrives at the spillway trailing specs and provenance markers
+- **The reification chain** — transcripts → PRD → spec → ADR → code → tests → docs. Every step traced. Every requirement has an ID.
+- **17 commands** all prefixed `/shit:` — this was not an accident, they worked backwards from the acronym
+- **Conception interviews** — structured design conversations captured as high-fidelity transcripts with `[U]/[C]/[T]/[S]` notation
+- **Provenance markers** — `@provenance: REQ-ID` comments link code to spec requirements like certificates of authenticity for your function declarations
+- **Six-layer verification** — scope, traceability, invariants, architecture, blast radius, gap analysis. `/shit:verify` runs them all.
+- **Distillation pipeline** — gate files carry spec rules forward into actionable checks at each phase
+- **Zero config** — directory layout hardcoded, conventions hardcoded, prefix hardcoded. Take it or leave it.
+- **Installation:** TBD *(the spec for the installation docs is probably somewhere in the pipeline)*
+
+
+---
+
 ## 2026-02-16 — "THE PAPERS, PLEASE UPDATE"
 
 Turns out every manifest in the whole marketplace was claiming MIT when the ACTUAL license is Jake's No Nonsense, No Nazi License. That's like putting a Honda badge on a TANK. Fixed that, and stamped SPDX headers on every source file so there's no confusion about whose slop this is.

@@ -118,13 +118,30 @@ And get this - when the docs are outdated, it's SMART enough to know! It'll offe
 
 👉 [Screwdriver Not Included](./plugins/claude-autosurgeon) 👈
 
+### 📋 Spec-Harness Implementation Trail (SHIT) - *"Seventeen Commands. One Prefix You Can't Say In Church."*
+
+Alright, I need you to sit DOWN for this one because I have never — in all my time at this spillway — had a plugin walk up to my booth where every single command starts with `/shit:`. That's the ACTUAL PREFIX. Spec-Harness Implementation Trail. They reverse-engineered a backronym. These people have COMMITMENT and I have RESPECT.
+
+But underneath the most aggressively named command prefix in software history is a genuinely sophisticated spec-driven development framework! You talk about your idea, it becomes a transcript, the transcript becomes a PRD, the PRD becomes a spec, the spec becomes decisions, the decisions become code, the code gets tests, and EVERY STEP is traced end-to-end with provenance markers! They call this the "reification chain" and I THINK that means "making vibes concrete"? I went to car school, not philosophy school!
+
+SIX LAYERS of verification! A pipeline with gate files! Semantic conformance attestation! It's like a building inspector for your codebase except the inspector is `/shit:verify` and the building is your spec compliance!
+
+Oh, and it's v0.1.0. Early beta. Installation is TBD. But the CONCEPT? *chef's kiss* You can sit in this one and make spec noises ALL DAY!
+
+**What you're tracing:** `/shit:init`, `/shit:conceive`, `/shit:verify`, `/shit:trace REQ-ID`, `/shit:attest`, and 12 more commands that are VERY IMPORTANT!
+
+**Honest disclosure:** Zero config. Completely opinionated. Will happily trace your terrible ideas end-to-end without judgement. *(That last part was from the plugin's own README. I did not write it. They wrote that THEMSELVES.)*
+
+👉 [Read The Full Spec (HA)](./plugins/spec-harness-implementation-trail) 👈
+
+
 ---
 
 *takes a step back and surveys the inventory*
 
-You know, looking at all this, we've really DIVERSIFIED here at the spillway! We got the **Medical Equipment Aisle** with the AutoSurgeon - scalpels, self-surgery, questionable medical practices! And NOW we got the **Hardware Store Section** with the Rest System - power drills, torque, boring through session history!
+You know, looking at all this, we've really DIVERSIFIED here at the spillway! We got the **Medical Equipment Aisle** with the AutoSurgeon — scalpels, self-surgery, questionable medical practices! The **Hardware Store Section** with the Rest System — power drills, torque, boring through session history! And NOW the **County Records Bureau** with the SHIT plugin — provenance chains, traceability matrices, six layers of inspection!
 
-What's next? Garden center? Pet store? ("Adopt a subagent TODAY!") The spillway is becoming a FULL-SERVICE operation! It's like if Home Depot and a sketchy urgent care clinic had a baby and that baby sold AI plugins!
+What's next? Garden center? Pet store? ("Adopt a subagent TODAY!") The spillway is becoming a FULL-SERVICE operation! It's like if Home Depot and a sketchy urgent care clinic and the county assessor's office had a baby and that baby sold AI plugins!
 
 ---
 
@@ -154,7 +171,7 @@ What's next? Garden center? Pet store? ("Adopt a subagent TODAY!") The spillway 
 
 ### 📋 The Full Catalog
 
-Can't get enough? Want MORE? You glutton for punishment, you! Check out the [complete inventory](./.claude-plugin/marketplace.json) - we got TEN, count 'em, TEN plugins planned! (Four exist! That's like... 40%! We're ALMOST HALFWAY!)
+Can't get enough? Want MORE? You glutton for punishment, you! Check out the [complete inventory](./.claude-plugin/marketplace.json) - we got TEN, count 'em, TEN plugins planned! (Five exist! That's HALF! We're at the HALFWAY POINT! It's all downhill from here! Wait, that sounds bad!)
 
 
 ## 🎨 WHAT KIND OF SLOP WE SLINGIN'?

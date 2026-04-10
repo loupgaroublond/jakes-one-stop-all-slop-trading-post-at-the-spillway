@@ -77,6 +77,25 @@
       "license": "LicenseRef-JNNNL-1.0"
     },
     {
+      "name": "spec-harness-implementation-trail",
+      "description": "SEVENTEEN commands all starting with /shit: and yes they did that on purpose! Spec-driven development with a full reification chain, provenance markers, six-layer verification, and zero config. Will happily trace your terrible ideas without judgement!",
+      "version": "0.1.0",
+      "author": {
+        "name": "All-Slop Marketplace",
+        "email": "marketplace@allslop.dev"
+      },
+      "source": "./plugins/spec-harness-implementation-trail",
+      "keywords": [
+        "spec-driven",
+        "traceability",
+        "verification",
+        "provenance",
+        "pipeline",
+        "reification"
+      ],
+      "license": "LicenseRef-JNNNL-1.0"
+    },
+    {
       "name": "code-review-assistant",
       "description": "Like having a really picky friend who actually READS your code! Automated reviews, best practices, security scans - now your code can feel judged 24/7!",
       "version": "1.0.0",
