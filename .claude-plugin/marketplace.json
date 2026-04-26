@@ -96,6 +96,24 @@
       "license": "LicenseRef-JNNNL-1.0"
     },
     {
+      "name": "claude-in-tmux",
+      "description": "Put Claude in a BOX! The box is TMUX! Drive a child claude session from a parent claude session and watch the WHOLE THING through capture-pane like a NATURE DOCUMENTARY! Comes with a 600-line skill explaining every way this can go wrong (and we know, because it WENT wrong)! No leaks into your real ~/.claude, GUARANTEED! (Guarantee not legally binding!)",
+      "version": "0.1.0",
+      "author": {
+        "name": "All-Slop Marketplace",
+        "email": "marketplace@allslop.dev"
+      },
+      "source": "./plugins/claude-in-tmux",
+      "keywords": [
+        "testing",
+        "tmux",
+        "claude-cli",
+        "integration-test",
+        "skill"
+      ],
+      "license": "LicenseRef-JNNNL-1.0"
+    },
+    {
       "name": "code-review-assistant",
       "description": "Like having a really picky friend who actually READS your code! Automated reviews, best practices, security scans - now your code can feel judged 24/7!",
       "version": "1.0.0",

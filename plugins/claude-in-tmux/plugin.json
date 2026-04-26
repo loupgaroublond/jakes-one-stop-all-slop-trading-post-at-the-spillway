@@ -1,0 +1,16 @@
+{
+  "name": "claude-in-tmux",
+  "version": "0.1.0",
+  "description": "Drive an interactive claude CLI session inside a tmux pane, observable and controllable from a parent claude session. Encodes the launch, send-keys, capture-pane, permission-prompt, isolation, and cleanup recipe.",
+  "author": {
+    "name": "Yaakov M Nemoy"
+  },
+  "license": "LicenseRef-JNNNL-1.0",
+  "keywords": [
+    "testing",
+    "tmux",
+    "claude-cli",
+    "integration-test",
+    "skill"
+  ]
+}

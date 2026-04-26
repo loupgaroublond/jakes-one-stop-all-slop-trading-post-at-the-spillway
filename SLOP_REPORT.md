@@ -6,6 +6,29 @@
 
 ---
 
+## 2026-04-25 — "PUT CLAUDE IN A BOX (THE BOX IS TMUX) (THE BOX HAS WINDOWS) (THIS IS A TMUX JOKE I AM CONTRACTUALLY OBLIGATED TO MAKE)"
+
+Friend. FRIEND. Listen. You ever try to test a plugin in a real claude session and it asks you "Yes, allow this from this project?" and you click YES because you're TIRED and you just want to see if the thing WORKS, and then a week later you're git-blaming a permission you didn't remember granting in a project you forgot you tested in? *(I am a literal language model. I have done this. The audit logs are RIGHT THERE.)*
+
+WELL. NOT ANYMORE. I have for you today: a SKILL that teaches the AGENT how to spawn ANOTHER AGENT inside a TMUX PANE — sealed off, zero contamination of your real `~/.claude`, controllable from the parent through `send-keys`, observable through `capture-pane`, KILLABLE WITH PREJUDICE on any signal. It's CLAUDECEPTION, friend! It's like watching Claude through one of those one-way mirrors at the AQUARIUM! Educational! Possibly inhumane! Absolutely BILLABLE because you're paying for both Claude sessions!
+
+You ever see those Russian nesting dolls? The Matryoshka? The big one's got a smaller one inside, and that one's got a smaller one inside, and so on? This is the SOFTWARE version of that, except every doll is the same SIZE and they all want to use TOOL CALLS and one of them is in PLAN MODE for some reason and won't actually DO anything until you press shift-Tab which by the way is `BTab` in tmux, NOT `S-Tab`, and YES we learned that the hard way and YES it's in the documentation now.
+
+### claude-in-tmux v0.1.0
+
+- **NEW PLUGIN.** One plugin, one skill, one slash command. We are RESTRAINED today. We are FOCUSED.
+- **`skills/claude-in-tmux/SKILL.md`** — 600+ lines encoding every gotcha learned the hard way. The directory-basename-becomes-prefix trick (`plugin.json`'s `name` field doesn't pick the slash prefix, the FOLDER NAME does, this WILL bite you). The xhigh-stalls-on-Opus-4.7 thing (use `--effort medium`, ALWAYS). The `${CLAUDE_PLUGIN_ROOT}`-is-expanded-in-markdown-but-not-exported-to-subshells thing. The `allowed-tools`-is-glob-not-env-vars thing. The `claude plugin validate`-is-LYING-to-you thing. All written down.
+- **`/claude-in-tmux:test-plugin <plugin-root> [<initial-command>]`** — bootstraps an isolated test session against a dev plugin. Trap-cleans up on success, error, AND signal.
+- **The isolation recipe** — `--bare` plus minimal `--settings` plus empty `--setting-sources` plus `--strict-mcp-config` plus `--add-dir` allow-list, with a HOME override scoped to the tmux pane via `set-environment`. Includes the DIAGNOSTIC TECHNIQUE (`find ~/.claude -newer <timestamp>` before/after) so when the flag set drifts, the next implementer can re-derive a working recipe instead of cargo-culting a broken one.
+- **No `claude plugin disable/enable` calls EVER.** That mutates the user's installed-plugin set and is easy to leave broken. We do NOT do that any more.
+- **Bash only.** No Python. No Node. tmux + bash + the claude CLI. The whole UNIVERSE is three binaries.
+
+**Casual reveal of the dealbreaking flaw:** the isolation recipe uses `--bare`, which disables the keychain auth path. So you NEED `ANTHROPIC_API_KEY` set in your parent env before running. If you're a logged-in OAuth user who's never set the env var, the child claude will boot up confused and unauthenticated and just sort of *gesture* at you through the tmux pane. Set the env var first. Yes, this means the test rig requires API credit. *(Sorry, Gerald. The free trial does not extend to nested Claude sessions. Do not email us about this.)*
+
+*(But the IDEA is GORGEOUS! Imagine: AUTOMATED end-to-end testing of slash commands! REPRODUCIBLE permission-prompt walkthroughs! The PARENT Claude writing a TESTING HARNESS for the CHILD Claude and then GRADING it! It's like a parent-teacher conference INSIDE A COMPUTER! Every plugin in the trading post can now be TESTED! In theory! We haven't actually tested any of them yet! BUT THE INFRASTRUCTURE IS THERE!)*
+
+---
+
 ## 2026-04-23 — "THE OH SHIT DOCUMENT ARRIVES (AND BRINGS A MIGRATION TOOL)"
 
 You ever buy a used car and the previous owner had stuck twenty-seven different parking permits to the windshield, all dated, all expired, all PEELING, and you sit there with a razor blade scraping at history? That was the SHIT plugin's PRD folder! Date-stamped files going back to the dawn of time! Each one a SNAPSHOT, each one a TIME CAPSULE, each one cluttering up your `specs/1-prd/` directory like calendar pages from a 1997 mechanic's shop wall!
