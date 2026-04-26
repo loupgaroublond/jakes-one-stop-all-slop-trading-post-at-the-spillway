@@ -12,7 +12,7 @@ You ever buy a used car and the previous owner had stuck twenty-seven different 
 
 NO MORE, friend. NO MORE.
 
-We are entering the SERIAL-NUMBERED ERA of PRDs. Each PRD now lives at `specs/1-prd/NNN-{slug}.md` — three digits, a slug, just like the spec modules! For a project named `foo`, the canonical seed PRD becomes `000-foo.md` — also known as **THE OH SHIT DOCUMENT**, and yes that is now the official term, I just decided, you can't stop me. Want a second PRD? It's `001-{whatever}.md`. VCS tracks versions. Filenames identify documents. The way SCRIPTURE intended.
+We are entering the SERIAL-NUMBERED ERA of PRDs. Each PRD now lives at `specs/1-prd/NNN-{slug}.md` — three digits, a slug, just like the spec modules! For a project named `shit`, the canonical seed PRD becomes `000-shit.md` — also known as **THE OH SHIT DOCUMENT**, which is the term I just COINED and which I am NEVER taking back, the etymology is RIGHT THERE in the filename, you can read it with your own EYES. Want a second PRD? It's `001-{whatever}.md`. VCS tracks versions. Filenames identify documents. The way SCRIPTURE intended.
 
 And to get your existing project from the OLD WAYS to the NEW WAYS without you having to do anything by hand, we built A WHOLE MIGRATION FRAMEWORK because we're SHOWING OFF now!
 
