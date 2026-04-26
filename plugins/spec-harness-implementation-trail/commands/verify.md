@@ -1,5 +1,6 @@
 ---
 description: Unified verification suite — complete project gap analysis
+allowed-tools: Bash(*schema-check.sh*)
 ---
 
 # Unified Verification Suite
@@ -7,6 +8,19 @@ description: Unified verification suite — complete project gap analysis
 Run all project verification checks and produce a combined gap analysis report.
 
 **Output:** `specs/4-docs/verification-report_{YYYY-MM-DD}.md`
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — orchestrators are sensitive to schema drift because their subcommands depend on layout. Recommend `/shit:migrate` before running. Refuse to proceed unless the user explicitly requests best-effort.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ## What This Command Does
 

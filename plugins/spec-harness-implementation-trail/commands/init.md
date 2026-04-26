@@ -1,12 +1,30 @@
+---
+description: Scaffold the specs/ directory in the current project
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Initialize Spec Harness
 
 Scaffold the `specs/` directory in the current project and populate it with starter content.
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=UNINITIALIZED` — proceed with initialization (this is the expected case).
+- `STATUS=OK` — `specs/` already exists at the latest schema. Tell the user the project is already initialized; do not overwrite anything. Print `ACTIVE` and `LATEST` for confirmation, then stop.
+- `STATUS=LEGACY` or `STATUS=MISMATCH` — `specs/` exists at an older schema. Do not re-scaffold. Report `ACTIVE` vs `LATEST` and recommend `/shit:migrate` to bring the project up to date.
 
 ## Process
 
 ### 1. Confirm the working directory
 
-Before creating anything, confirm you're in the project root. The `specs/` directory will be created here. If a `specs/` directory already exists, stop and report to the user — do not overwrite existing content.
+Before creating anything, confirm you're in the project root. The `specs/` directory will be created here. The schema check above already verified that `specs/` does not exist (`STATUS=UNINITIALIZED`); if it does for any reason, stop.
 
 ### 2. Create the directory structure
 
@@ -51,7 +69,11 @@ Copy each file from `${CLAUDE_PLUGIN_ROOT}/templates/gates/` into `specs/gates/`
 
 These are starters. The user edits them to match their project's specs. The `/shit:distill` command updates them when the specs change.
 
-### 6. Write a minimal starter transcript process doc
+### 6. Write the schema marker
+
+Copy `${CLAUDE_PLUGIN_ROOT}/templates/shit.toml` to `specs/.shit.toml`. This marks the project as following the latest schema (currently v2). `/shit:migrate` reads this file when the schema bumps in future plugin releases.
+
+### 7. Write a minimal starter transcript process doc
 
 Write `specs/0-transcripts/process.md` as an empty meta-document that tracks open questions and tangent notes. Use this template:
 
@@ -68,12 +90,13 @@ _None yet._
 _None yet._
 ```
 
-### 7. Report what was created
+### 8. Report what was created
 
 Print a summary:
 
 ```
 Created specs/ directory structure:
+  specs/.shit.toml — schema version marker (v2)
   specs/0-transcripts/ — design interview transcripts
   specs/1-prd/ — product requirements
   specs/2-spec/ — formal specifications
@@ -84,7 +107,8 @@ Created specs/ directory structure:
 
 Next steps:
   1. Run /shit:conceive to start your first design interview
-     OR write an initial PRD at specs/1-prd/prd_{date}.md
+     OR write an initial PRD at specs/1-prd/000-{slug}.md
+     (e.g. for a project named "foo": specs/1-prd/000-foo.md)
   2. Review specs/gates/ — the starter files describe a generic process.
      Edit them to match your project, or run /shit:distill once you have specs.
   3. Read specs/reification.md for the full conceptual overview.

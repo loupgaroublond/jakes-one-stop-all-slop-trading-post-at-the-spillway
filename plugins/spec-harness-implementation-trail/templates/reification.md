@@ -31,7 +31,7 @@ Raw design conversations and their artifacts. This is the primary source materia
 Formal requirements derived from transcripts. The PRD is the canonical statement of what the system must do.
 
 **Contents:**
-- `prd_*.md` — Current PRD (versioned by date)
+- `NNN-<slug>.md` — PRD documents, three-digit prefix plus a slug (e.g. `000-foo.md` for the project's main "oh shit document"). Multiple PRDs can coexist when a project has distinct requirement domains. VCS handles versioning; filenames identify documents.
 
 **Update trigger:** When design conversations reveal new requirements or change existing ones
 **Verification:** Every transcript topic should be reflected in PRD sections

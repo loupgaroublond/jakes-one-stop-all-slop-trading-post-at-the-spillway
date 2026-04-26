@@ -1,8 +1,26 @@
+---
+description: Distill spec rules into actionable gate checks
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Distill Spec Rules into Gate Checks
 
 Read the project's specs and ADRs and produce distilled, actionable checks for each gate file in `specs/gates/`. This is the workflow that turns abstract spec rules into concrete verification steps that `/shit:verify` can execute.
 
 **Usage:** `/shit:distill` (single sweep across all specs and all gates)
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — the project is on schema v$ACTIVE; this command targets v$LATEST. Recommend `/shit:migrate`. If the user wants to defer and the rest of this command does not depend on the changed layout, you may proceed in best-effort mode and warn about possibly stale results.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ## Purpose
 

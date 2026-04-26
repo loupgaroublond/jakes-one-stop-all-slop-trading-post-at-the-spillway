@@ -1,8 +1,26 @@
+---
+description: Trace a requirement through PRD → spec → code → tests
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Requirement Traceability Chain
 
 Trace a single requirement through every pipeline stage: PRD → spec → code → tests.
 
 **Usage:** `/shit:trace REQ-AUTH-003`
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — the project is on schema v$ACTIVE; this command targets v$LATEST. Recommend `/shit:migrate`. If the user wants to defer and the rest of this command does not depend on the changed layout, you may proceed in best-effort mode and warn about possibly stale results.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ## Process
 
@@ -26,7 +44,7 @@ Display the full block.
 
 ### 3. Trace to PRD
 
-From the `**Source:**` field, extract the PRD section reference (e.g., `PRD §4.1`). Read the most recent PRD file in `specs/1-prd/prd_*.md` and find the corresponding section. Extract and display the relevant paragraph(s) that this requirement derives from.
+From the `**Source:**` field, extract the PRD section reference (e.g., `PRD §4.1`). The Source field may name a specific PRD document; if not, search across all PRD files in `specs/1-prd/` matching `[0-9][0-9][0-9]-*.md` for the corresponding section. Extract and display the relevant paragraph(s) that this requirement derives from.
 
 ### 4. Search Code Provenance
 
@@ -102,7 +120,7 @@ Do NOT run heuristic mode unless the user explicitly requests it.
 
 - `specs/2-spec/000-index.md` — prefix-to-module mapping
 - `specs/2-spec/*.md` — spec modules
-- `specs/1-prd/prd_*.md` — PRD (most recent by date)
+- `specs/1-prd/[0-9][0-9][0-9]-*.md` — PRD documents (serial-with-slug naming)
 - Project source files — code provenance
 - Project test files — test provenance
 

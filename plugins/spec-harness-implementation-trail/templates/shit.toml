@@ -1,0 +1,6 @@
+# SHIT plugin per-project state.
+# Tracks which schema version this project's specs/ layout follows.
+# Bumped automatically by /shit:migrate.
+
+[schema]
+version = 2

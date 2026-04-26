@@ -1,5 +1,6 @@
 ---
 description: Light cleanup — audit transcripts, update reader, compile spec, update status
+allowed-tools: Bash(*schema-check.sh*)
 ---
 
 # Update Status — Light Cleanup Orchestrator
@@ -7,6 +8,19 @@ description: Light cleanup — audit transcripts, update reader, compile spec, u
 Run 4 cleanup steps in sequence with error gating. Each step must succeed before the next begins.
 
 **Steps:** `/shit:audit-transcripts` → `/shit:reader` → `/shit:spec-reader` → `/shit:status`
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — orchestrators are sensitive to schema drift because their subcommands depend on layout. Recommend `/shit:migrate` before running. Refuse to proceed unless the user explicitly requests best-effort.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 **Error gating:** After each step, check result. "Nothing new found" is SUCCESS. Broken data, file write failures, exceptions = FAILURE → halt immediately.
 

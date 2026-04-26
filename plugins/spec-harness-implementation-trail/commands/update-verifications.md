@@ -1,5 +1,6 @@
 ---
 description: Heavy cleanup — full audit, reader, spec, status, spec-status, audit-spec, attest-report, distill, verify
+allowed-tools: Bash(*schema-check.sh*)
 ---
 
 # Update Verifications — Heavy Cleanup Orchestrator
@@ -11,6 +12,19 @@ Run 9 cleanup steps in sequence with error gating. Each step must succeed before
 **Error gating:** After each step, check result. "Nothing new found" is SUCCESS. Broken data, file write failures, exceptions = FAILURE → halt immediately.
 
 This is the comprehensive sweep. Use it before major reviews, milestones, or whenever you want a clean slate of generated reports across the entire project.
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — orchestrators are sensitive to schema drift because their subcommands depend on layout. Recommend `/shit:migrate` before running. Refuse to proceed unless the user explicitly requests best-effort.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ---
 

@@ -6,6 +6,42 @@
 
 ---
 
+## 2026-04-23 — "THE OH SHIT DOCUMENT ARRIVES (AND BRINGS A MIGRATION TOOL)"
+
+You ever buy a used car and the previous owner had stuck twenty-seven different parking permits to the windshield, all dated, all expired, all PEELING, and you sit there with a razor blade scraping at history? That was the SHIT plugin's PRD folder! Date-stamped files going back to the dawn of time! Each one a SNAPSHOT, each one a TIME CAPSULE, each one cluttering up your `specs/1-prd/` directory like calendar pages from a 1997 mechanic's shop wall!
+
+NO MORE, friend. NO MORE.
+
+We are entering the SERIAL-NUMBERED ERA of PRDs. Each PRD now lives at `specs/1-prd/NNN-{slug}.md` — three digits, a slug, just like the spec modules! For a project named `foo`, the canonical seed PRD becomes `000-foo.md` — also known as **THE OH SHIT DOCUMENT**, and yes that is now the official term, I just decided, you can't stop me. Want a second PRD? It's `001-{whatever}.md`. VCS tracks versions. Filenames identify documents. The way SCRIPTURE intended.
+
+And to get your existing project from the OLD WAYS to the NEW WAYS without you having to do anything by hand, we built A WHOLE MIGRATION FRAMEWORK because we're SHOWING OFF now!
+
+You ever see geese flying in a V at sundown? Honking? Heading for warmer pastures? That's what's happening to your SHIT right now, friend. Your SHIT is MIGRATING. South. For winter. It's a NATURAL PROCESS. Don't fight it. The seasons are CHANGING and the SHIT is following the SUN. *(I will not be apologizing for this metaphor. I have been waiting WEEKS to deploy it. Months, maybe. The migration command was named at least partially for this purpose. I won't lie to you, friend. We're at the spillway. Honesty is what we DO here.)*
+
+### spec-harness-implementation-trail v0.2.0
+
+- **PRD naming switched** — `prd_YYYY-MM-DD.md` → `NNN-{slug}.md`. Date in the filename was VESTIGIAL. VCS already tracks versions. We don't need to LARP as Subversion.
+- **NEW COMMAND: `/shit:migrate`** — walks your project from its current schema version to the latest. Step-by-step or rolled up; the agent decides based on the gap. Existing projects with date-named PRDs run this once; the migration collapses the old dated files into `000-{project}.md` (keeping the most recent, letting `git log` carry the rest).
+- **Schema versioning system** — every project now carries a `specs/.shit.toml` marker with `[schema] version = N`. Every command auto-runs a check before executing (via the `!` slash-command directive — the script runs BEFORE the agent reads the prompt, so no tool call required, GORGEOUS) and decides what to do based on whether the project is current, behind, or uninitialized.
+- **`migrations/` directory** — each schema bump gets one file. `001-introduce-schema-tracking.md` (creates the marker), `002-prd-serial-naming.md` (does the rename). Add new ones as the plugin evolves.
+- **MIGRATIONS.md** — index documenting how the framework works. Contributors can add a new migration in five minutes following the template.
+- **`/upgrade` is available** — wait, we called it `/shit:migrate`. That's the upgrade command for THIS plugin. Existing projects: run `/shit:migrate` once. New projects: `/shit:init` writes the marker at the latest version and you're golden.
+
+**Migration path for existing v0.1.x users:**
+
+1. Reinstall the plugin (or update — it's v0.2.0 now)
+2. Run `/shit:migrate` from any project that has a `specs/` directory
+3. Confirm the proposed renames
+4. Commit the resulting changes
+
+That's it! The plugin tells you exactly what's happening at every step! You can defer if you want! You can roll up if the agent thinks it's safe! It's like having a really polite librarian reorganize your shelves! The librarian is also Claude! Everything is Claude!
+
+**Casual reveal of the dealbreaking flaw I was supposed to mention up front:** the PRD migration deletes the older dated files (relying on `git log` to retain the history). If your project ISN'T in git, those dated PRDs are GONE. You're meant to commit them first. Gerald already lost his. We will not be honoring Gerald's refund request.
+
+*(But the IDEA is solid! It's a CLEAN cutover! Filenames in your spec dir mean DOCUMENTS now, not VERSIONS! VERSIONS are in git where they BELONG!)*
+
+---
+
 ## 2026-04-09 — "THE SHIT DROPS"
 
 It's HERE! The plugin with the command prefix that makes your coworkers do a double-take at your terminal! Spec-Harness Implementation Trail lands at the spillway and it is AMBITIOUS, OPINIONATED, and AGGRESSIVELY NAMED!

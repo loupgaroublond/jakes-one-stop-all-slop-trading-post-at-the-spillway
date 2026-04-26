@@ -1,6 +1,6 @@
 {
   "name": "shit",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Spec-driven development process for Claude Code. Conception interviews, reification chain (transcripts → PRD → spec → ADR → code → tests → docs), provenance markers, change pipeline, and multi-layer verification. Opinionated, no config — adopt the conventions or don't use the plugin.",
   "author": {
     "name": "Yaakov M Nemoy"

@@ -1,6 +1,24 @@
+---
+description: Compile active spec modules into a single markdown file
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Spec Reader — Compiled Active Specification
 
 Compile all active spec modules into a single markdown file, stripping dropped sections.
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — the project is on schema v$ACTIVE; this command targets v$LATEST. Recommend `/shit:migrate`. If the user wants to defer and the rest of this command does not depend on the changed layout, you may proceed in best-effort mode and warn about possibly stale results.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ## What To Do
 

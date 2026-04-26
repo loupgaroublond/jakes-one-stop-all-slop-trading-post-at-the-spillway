@@ -1,6 +1,24 @@
+---
+description: Verify code and tests satisfy the behavioral properties specified in requirements
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Semantic Conformance Attestation
 
 Analyze whether code and tests actually satisfy the behavioral properties specified in requirements — not just whether provenance markers exist.
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — the project is on schema v$ACTIVE; this command targets v$LATEST. Recommend `/shit:migrate`. If the user wants to defer and the rest of this command does not depend on the changed layout, you may proceed in best-effort mode and warn about possibly stale results.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 **Usage:**
 
@@ -151,7 +169,7 @@ Then output individual report cards for each requirement.
 
 - `specs/2-spec/000-index.md` — Prefix-to-module mapping and module listing
 - `specs/2-spec/*.md` — Spec modules containing requirement definitions
-- `specs/1-prd/prd_*.md` — PRD (for source field context, most recent)
+- `specs/1-prd/[0-9][0-9][0-9]-*.md` — PRD documents (for source field context)
 - Project source files — Code provenance
 - Project test files — Test provenance
 

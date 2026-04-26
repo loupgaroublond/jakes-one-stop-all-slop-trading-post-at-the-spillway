@@ -1,12 +1,32 @@
+---
+description: Walk the pipeline checking for gaps between PRD, spec, code, and tests
+allowed-tools: Bash(*schema-check.sh*)
+---
+
 # Spec Audit — PRD-to-Spec Coverage Verification
 
 Walk the entire pipeline checking for gaps between PRD, spec modules, code, and tests.
+
+## Schema check
+
+This command targets schema version **2**.
+
+Active project state:
+
+!`"${CLAUDE_PLUGIN_ROOT}/scripts/schema-check.sh"`
+
+Decide based on the output above:
+- `STATUS=OK` — proceed.
+- `STATUS=MISMATCH` or `STATUS=LEGACY` — this command writes structured output that depends on PRD layout. Tell the user the project is on schema v$ACTIVE but this command targets v$LATEST and recommend `/shit:migrate` first. Offer to defer and run anyway in best-effort mode (treat any `prd_*.md` as a single PRD), but make clear the output may be inaccurate.
+- `STATUS=UNINITIALIZED` — tell the user to run `/shit:init` first.
 
 ## Process
 
 ### 1. Extract PRD Section Headers
 
-Read the most recent PRD file in `specs/1-prd/prd_*.md` and extract all `## N. Title` and `## N.N Title` section headers. Build a list of all PRD sections with their numbers and titles.
+Read all PRD files in `specs/1-prd/` matching `[0-9][0-9][0-9]-*.md` (serial-with-slug naming, e.g. `000-foo.md`). Each file is a distinct PRD document. Extract all `## N. Title` and `## N.N Title` section headers across all PRDs. Build a list of all PRD sections with their numbers, titles, and source file.
+
+(Legacy fallback: if no `NNN-*.md` files exist but `prd_*.md` files do, the project hasn't migrated to schema v2 yet. Use the most recent dated file as a single PRD and warn the user to run `/shit:migrate`.)
 
 ### 2. Load Coverage Matrix
 
@@ -197,7 +217,7 @@ Plus a transition rate table:
 
 ## Key Files
 
-- `specs/1-prd/prd_*.md` — most recent PRD
+- `specs/1-prd/[0-9][0-9][0-9]-*.md` — PRD documents (serial-with-slug naming)
 - `specs/2-spec/000-index.md` — coverage matrix and module index
 - `specs/2-spec/*.md` — spec modules
 - Project source files — code provenance

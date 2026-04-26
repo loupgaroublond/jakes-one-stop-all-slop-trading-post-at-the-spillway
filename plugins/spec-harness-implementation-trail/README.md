@@ -137,10 +137,31 @@ Housekeeping. Even the spillway gets swept occasionally.
 
 - `/shit:update-status` — Light cleanup (4 steps)
 - `/shit:update-verifications` — Heavy cleanup (9 steps)
+- `/shit:migrate` — Walk your project from its active schema version to the latest. The plugin's own self-upgrade tool. (See "Schema Migrations" below.)
 
 ### Pipeline
 
 - `/shit:pipeline-dashboard` — Display active pipeline state. Every good system has a DASHBOARD!
+
+
+## Schema Migrations
+
+Every SHIT project carries a tiny marker file at `specs/.shit.toml`:
+
+```toml
+[schema]
+version = 2
+```
+
+When the plugin's conventions change in a way that would break old projects (filenames change, directory layout shifts, marker syntax updates), the plugin's internal `migrations/` directory grows by one file. Each migration is a self-contained markdown document with detection commands, migration steps, and verification — the agent reads it and walks you through.
+
+Every command in the plugin auto-runs a schema check the moment it's invoked. If your project is on an older version than the plugin expects, the command tells you and points at `/shit:migrate`. You can defer for read-only commands; orchestrators (`/shit:verify`, `/shit:update-verifications`) refuse politely until the project is current.
+
+Run `/shit:migrate` whenever you reinstall or update the plugin. It detects the gap, plans the work (rollup vs step-by-step), and writes the new schema version to `specs/.shit.toml` after each step. If you're starting fresh, `/shit:init` writes the marker at the latest version automatically — no migration needed.
+
+**For new projects:** `/shit:init` handles everything. The marker file gets the latest schema version, your first PRD goes at `specs/1-prd/000-{project}.md` (the OH SHIT DOCUMENT), and you're off.
+
+**For projects upgrading from a pre-0.2.0 install:** run `/shit:migrate` once. It bootstraps the marker and renames any date-stamped PRDs (`prd_YYYY-MM-DD.md` → `000-{slug}.md`).
 
 
 ## Provenance Markers
